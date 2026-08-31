@@ -586,17 +586,17 @@ export function KycUploader({ userId }: { userId: string }) {
               !selfieFileUrl ||
               !docNumber.trim()
             }
-            className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-12 text-sm flex items-center justify-center space-x-2"
+            className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold min-h-12 py-3 px-4 text-xs sm:text-sm flex items-center justify-center space-x-2 text-center whitespace-normal leading-snug shadow-lg"
           >
             {verifyingAi ? (
               <>
-                <RefreshCw className="h-4 w-4 animate-spin" />
+                <RefreshCw className="h-4 w-4 animate-spin flex-shrink-0" />
                 <span>Analizando OCR & Biometría Facial con IA (24/7)...</span>
               </>
             ) : (
               <>
-                <Sparkles className="h-4 w-4" />
-                <span>Verificar Mi Cuenta Instantáneamente con IA (24/7)</span>
+                <Sparkles className="h-4 w-4 flex-shrink-0 text-emerald-300" />
+                <span>Verificar Mi Cuenta con IA (24/7)</span>
               </>
             )}
           </Button>
