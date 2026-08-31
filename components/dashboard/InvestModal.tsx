@@ -144,8 +144,8 @@ export function InvestModal({ isOpen, onClose, project, onInvestmentComplete }: 
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(Number(e.target.value))}
-                min={5000}
-                step={5000}
+                min={1000}
+                step={1000}
                 required
                 className="mt-1 text-lg font-bold text-emerald-400"
               />

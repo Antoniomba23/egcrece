@@ -421,9 +421,9 @@ export function WithdrawModal({ isOpen, onClose, availableBalance, onWithdrawCom
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(Number(e.target.value))}
-                min={2000}
-                max={availableBalance > 0 ? availableBalance : 2000}
-                step={2000}
+                min={1000}
+                max={availableBalance > 0 ? availableBalance : 1000}
+                step={1000}
                 required
                 className="mt-1 text-lg font-bold text-teal-400 bg-slate-950 border-slate-800"
               />

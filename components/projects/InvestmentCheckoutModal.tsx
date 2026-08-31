@@ -228,8 +228,8 @@ export function InvestmentCheckoutModal({
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(Number(e.target.value))}
-                min={5000}
-                step={5000}
+                min={1000}
+                step={1000}
                 required
                 className="mt-1 text-lg font-bold text-emerald-400 bg-slate-950 border-slate-800"
               />
