@@ -16,16 +16,9 @@ import {
   Globe2,
   Camera,
   FileText,
-  UserCheck,
   Sparkles,
   RefreshCw,
-  Clock,
-  Lock,
-  Smartphone,
-  QrCode,
 } from "lucide-react";
-import { LiveCameraModal } from "@/components/kyc/LiveCameraModal";
-import { MobileQrSync } from "@/components/kyc/MobileQrSync";
 
 export function KycUploader({ userId }: { userId: string }) {
   const [docType, setDocType] = useState<string>("Pasaporte Internacional");
@@ -40,35 +33,7 @@ export function KycUploader({ userId }: { userId: string }) {
   // Estados de carga individual
   const [uploadingFront, setUploadingFront] = useState<boolean>(false);
   const [uploadingBack, setUploadingBack] = useState<boolean>(false);
-
-  // Estados de cámara en directo (webcam/móvil)
-  const [isCameraOpen, setIsCameraOpen] = useState<boolean>(false);
-  const [cameraTarget, setCameraTarget] = useState<"selfie" | "front" | "back">("selfie");
-
-  // Estados de sincronización con Código QR para Móvil
-  const [isQrSyncOpen, setIsQrSyncOpen] = useState<boolean>(false);
-  const [qrTarget, setQrTarget] = useState<"selfie" | "front" | "back">("selfie");
-
-  const openCameraModal = (target: "selfie" | "front" | "back") => {
-    setCameraTarget(target);
-    setIsCameraOpen(true);
-  };
-
-  const openQrModal = (target: "selfie" | "front" | "back") => {
-    setQrTarget(target);
-    setIsQrSyncOpen(true);
-  };
-
-  const handlePhotoReceivedFromQr = (fileUrl: string, target: "selfie" | "front" | "back") => {
-    if (target === "front") setFrontFileUrl(fileUrl);
-    if (target === "back") setBackFileUrl(fileUrl);
-    if (target === "selfie") setSelfieFileUrl(fileUrl);
-
-    setStatusMessage({
-      type: "success",
-      text: `¡Foto de ${target} recibida exitosamente desde su teléfono móvil!`,
-    });
-  };
+  const [uploadingSelfie, setUploadingSelfie] = useState<boolean>(false);
 
   const [verifyingAi, setVerifyingAi] = useState<boolean>(false);
   const [attemptsCount, setAttemptsCount] = useState<number>(0);
@@ -108,9 +73,10 @@ export function KycUploader({ userId }: { userId: string }) {
     try {
       if (target === "front") setUploadingFront(true);
       if (target === "back") setUploadingBack(true);
+      if (target === "selfie") setUploadingSelfie(true);
 
-      if (file.size > 5 * 1024 * 1024) {
-        throw new Error("El archivo supera el tamaño máximo de 5MB.");
+      if (file.size > 8 * 1024 * 1024) {
+        throw new Error("El archivo supera el tamaño máximo de 8MB.");
       }
 
       const fileExt = file.name.split(".").pop();
@@ -136,6 +102,11 @@ export function KycUploader({ userId }: { userId: string }) {
       if (target === "front") setFrontFileUrl(finalPath);
       if (target === "back") setBackFileUrl(finalPath);
       if (target === "selfie") setSelfieFileUrl(finalPath);
+
+      setStatusMessage({
+        type: "success",
+        text: `Foto de ${target === "front" ? "frente/pasaporte" : target === "back" ? "reverso" : "selfie"} cargada exitosamente.`,
+      });
     } catch (err: any) {
       setStatusMessage({
         type: "error",
@@ -144,6 +115,7 @@ export function KycUploader({ userId }: { userId: string }) {
     } finally {
       if (target === "front") setUploadingFront(false);
       if (target === "back") setUploadingBack(false);
+      if (target === "selfie") setUploadingSelfie(false);
     }
   };
 
@@ -171,7 +143,7 @@ export function KycUploader({ userId }: { userId: string }) {
       }
 
       if (!selfieFileUrl) {
-        throw new Error("Debe tomar su Selfie en Vivo desde la cámara o escanear el QR desde el móvil.");
+        throw new Error("Debe seleccionar o tomar su Selfie / Foto de Rostro.");
       }
 
       // Llamar al endpoint serverless de validación por IA
@@ -305,8 +277,8 @@ export function KycUploader({ userId }: { userId: string }) {
             </CardTitle>
             <CardDescription className="text-xs text-slate-300 mt-1">
               {isPassport
-                ? "Pasaportes: Solo requiere 2 fotos (Página Principal + Selfie en Vivo desde la Cámara o Móvil QR)."
-                : "DNI / Tarjetas: Requiere 3 fotos (Frente, Dorso y Selfie en Vivo desde Cámara o Móvil QR)."}
+                ? "Pasaportes: Solo requiere 2 fotos (Página Principal + Selfie / Foto de Rostro)."
+                : "DNI / Tarjetas: Requiere 3 fotos (Frente, Dorso y Selfie / Foto de Rostro)."}
             </CardDescription>
           </div>
 
@@ -328,10 +300,10 @@ export function KycUploader({ userId }: { userId: string }) {
         <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2 text-xs">
           <div className="flex items-center space-x-2 text-emerald-400 font-bold">
             <Sparkles className="h-4 w-4" />
-            <span>Motor Biométrico 24/7 & Sincronización QR Móvil</span>
+            <span>Carga Directa de Fotografías y Documentación</span>
           </div>
           <p className="text-slate-300 leading-relaxed">
-            Si su ordenador no tiene cámara o los permisos han sido denegados, puede pulsar **"Escanear QR con Móvil"** en cualquier tarjeta para tomar la foto con la cámara de su smartphone.
+            Presione <strong>"Seleccionar o Tomar Foto"</strong> en cada recuadro. En teléfonos móviles podrá elegir entre usar la <strong>Cámara en vivo</strong> o seleccionar una foto existente de su <strong>Galería</strong>.
           </p>
         </div>
 
@@ -435,38 +407,29 @@ export function KycUploader({ userId }: { userId: string }) {
                 </div>
 
                 {frontFileUrl ? (
-                  <Badge className="bg-emerald-950 text-emerald-400 border-emerald-800 text-[10px] mx-auto">
-                    ✓ Foto Lista
-                  </Badge>
-                ) : (
-                  <div className="flex flex-col gap-1.5 pt-2">
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={() => openCameraModal("front")}
-                      className="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] h-8 px-2 flex items-center justify-center space-x-1 font-bold"
-                    >
-                      <Camera className="h-3.5 w-3.5 mr-1" />
-                      <span>Abrir Cámara</span>
-                    </Button>
-
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openQrModal("front")}
-                      className="border-slate-800 text-emerald-400 text-[10px] h-7 px-1 flex items-center justify-center space-x-1"
-                    >
-                      <QrCode className="h-3 w-3 mr-1" />
-                      <span>Escanear QR con Móvil</span>
-                    </Button>
-
-                    <label className="inline-block cursor-pointer bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-[10px] text-slate-300 font-semibold transition-all">
-                      <span>{uploadingFront ? "Subiendo..." : "📁 Galería / Archivo"}</span>
+                  <div className="space-y-2 pt-2">
+                    <Badge className="bg-emerald-950 text-emerald-400 border-emerald-800 text-[10px] mx-auto block py-1">
+                      ✓ Foto Lista
+                    </Badge>
+                    <label className="cursor-pointer text-[10px] text-slate-400 hover:text-emerald-400 underline block font-semibold">
+                      <span>Cambiar Foto</span>
                       <input
                         type="file"
-                        accept="image/*,application/pdf"
-                        capture="environment"
+                        accept="image/*"
+                        disabled={uploadingFront}
+                        onChange={(e) => e.target.files?.[0] && handleSingleFileUpload(e.target.files[0], "front")}
+                        className="sr-only"
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <div className="pt-2">
+                    <label className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg px-3 py-2.5 text-xs flex items-center justify-center space-x-1.5 transition-all shadow-md">
+                      <Upload className="h-4 w-4 flex-shrink-0" />
+                      <span className="truncate">{uploadingFront ? "Subiendo..." : "📁 Seleccionar o Tomar Foto"}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
                         disabled={uploadingFront}
                         onChange={(e) => e.target.files?.[0] && handleSingleFileUpload(e.target.files[0], "front")}
                         className="sr-only"
@@ -488,38 +451,29 @@ export function KycUploader({ userId }: { userId: string }) {
                   </div>
 
                   {backFileUrl ? (
-                    <Badge className="bg-emerald-950 text-emerald-400 border-emerald-800 text-[10px] mx-auto">
-                      ✓ Foto Lista
-                    </Badge>
-                  ) : (
-                    <div className="flex flex-col gap-1.5 pt-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        onClick={() => openCameraModal("back")}
-                        className="bg-teal-600 hover:bg-teal-500 text-white text-[11px] h-8 px-2 flex items-center justify-center space-x-1 font-bold"
-                      >
-                        <Camera className="h-3.5 w-3.5 mr-1" />
-                        <span>Abrir Cámara</span>
-                      </Button>
-
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openQrModal("back")}
-                        className="border-slate-800 text-teal-400 text-[10px] h-7 px-1 flex items-center justify-center space-x-1"
-                      >
-                        <QrCode className="h-3 w-3 mr-1" />
-                        <span>Escanear QR con Móvil</span>
-                      </Button>
-
-                      <label className="inline-block cursor-pointer bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-[10px] text-slate-300 font-semibold transition-all">
-                        <span>{uploadingBack ? "Subiendo..." : "📁 Galería / Archivo"}</span>
+                    <div className="space-y-2 pt-2">
+                      <Badge className="bg-emerald-950 text-emerald-400 border-emerald-800 text-[10px] mx-auto block py-1">
+                        ✓ Foto Lista
+                      </Badge>
+                      <label className="cursor-pointer text-[10px] text-slate-400 hover:text-teal-400 underline block font-semibold">
+                        <span>Cambiar Foto</span>
                         <input
                           type="file"
-                          accept="image/*,application/pdf"
-                          capture="environment"
+                          accept="image/*"
+                          disabled={uploadingBack}
+                          onChange={(e) => e.target.files?.[0] && handleSingleFileUpload(e.target.files[0], "back")}
+                          className="sr-only"
+                        />
+                      </label>
+                    </div>
+                  ) : (
+                    <div className="pt-2">
+                      <label className="w-full cursor-pointer bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-lg px-3 py-2.5 text-xs flex items-center justify-center space-x-1.5 transition-all shadow-md">
+                        <Upload className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{uploadingBack ? "Subiendo..." : "📁 Seleccionar o Tomar Foto"}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
                           disabled={uploadingBack}
                           onChange={(e) => e.target.files?.[0] && handleSingleFileUpload(e.target.files[0], "back")}
                           className="sr-only"
@@ -530,47 +484,47 @@ export function KycUploader({ userId }: { userId: string }) {
                 </div>
               )}
 
-              {/* Tarjeta 3: Foto Carné / Selfie Rostro en VIVO (CÁMARA O QR MÓVIL) */}
+              {/* Tarjeta 3: Selfie / Foto de Rostro */}
               <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-center space-y-3 relative flex flex-col justify-between">
                 <div className="space-y-2">
                   <Camera className="mx-auto h-7 w-7 text-blue-400" />
                   <div className="space-y-1">
                     <span className="text-xs font-bold text-white block">
-                      {isPassport ? "2. Selfie en Vivo (Cámara/QR)" : "3. Selfie en Vivo (Cámara/QR)"}
+                      {isPassport ? "2. Selfie / Foto de Rostro" : "3. Selfie / Foto de Rostro"}
                     </span>
                     <span className="text-[10px] text-slate-400 block">Rostro Biométrico Vivo</span>
                   </div>
                 </div>
 
                 {selfieFileUrl ? (
-                  <Badge className="bg-emerald-950 text-emerald-400 border-emerald-800 text-[10px] mx-auto">
-                    ✓ Selfie Lista
-                  </Badge>
+                  <div className="space-y-2 pt-2">
+                    <Badge className="bg-emerald-950 text-emerald-400 border-emerald-800 text-[10px] mx-auto block py-1">
+                      ✓ Selfie Lista
+                    </Badge>
+                    <label className="cursor-pointer text-[10px] text-slate-400 hover:text-blue-400 underline block font-semibold">
+                      <span>Cambiar Foto</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        disabled={uploadingSelfie}
+                        onChange={(e) => e.target.files?.[0] && handleSingleFileUpload(e.target.files[0], "selfie")}
+                        className="sr-only"
+                      />
+                    </label>
+                  </div>
                 ) : (
-                  <div className="flex flex-col gap-1.5 pt-2">
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={() => openCameraModal("selfie")}
-                      className="bg-blue-600 hover:bg-blue-500 text-white text-[11px] h-8 px-2 flex items-center justify-center space-x-1 font-bold shadow-lg"
-                    >
-                      <Camera className="h-3.5 w-3.5 mr-1" />
-                      <span>Abrir Cámara</span>
-                    </Button>
-
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openQrModal("selfie")}
-                      className="border-slate-800 text-blue-400 hover:text-blue-300 text-[11px] h-8 px-2 flex items-center justify-center space-x-1 font-bold"
-                    >
-                      <QrCode className="h-3.5 w-3.5 mr-1" />
-                      <span>📱 Escanear QR en Móvil</span>
-                    </Button>
-                    <span className="text-[9px] text-slate-500 block italic">
-                      Cámara u Ordenador/Móvil con QR
-                    </span>
+                  <div className="pt-2">
+                    <label className="w-full cursor-pointer bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg px-3 py-2.5 text-xs flex items-center justify-center space-x-1.5 transition-all shadow-md">
+                      <Upload className="h-4 w-4 flex-shrink-0" />
+                      <span className="truncate">{uploadingSelfie ? "Subiendo..." : "📁 Seleccionar o Tomar Foto"}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        disabled={uploadingSelfie}
+                        onChange={(e) => e.target.files?.[0] && handleSingleFileUpload(e.target.files[0], "selfie")}
+                        className="sr-only"
+                      />
+                    </label>
                   </div>
                 )}
               </div>
@@ -602,27 +556,6 @@ export function KycUploader({ userId }: { userId: string }) {
           </Button>
         </form>
       </CardContent>
-
-      {/* Modal de Cámara en Directo */}
-      <LiveCameraModal
-        isOpen={isCameraOpen}
-        onClose={() => setIsCameraOpen(false)}
-        target={cameraTarget}
-        onCapture={(file) => handleSingleFileUpload(file, cameraTarget)}
-        onOpenQrSync={() => {
-          setQrTarget(cameraTarget);
-          setIsQrSyncOpen(true);
-        }}
-      />
-
-      {/* Modal de Sincronización QR Móvil */}
-      <MobileQrSync
-        isOpen={isQrSyncOpen}
-        onClose={() => setIsQrSyncOpen(false)}
-        userId={userId}
-        target={qrTarget}
-        onPhotoReceived={(url) => handlePhotoReceivedFromQr(url, qrTarget)}
-      />
     </Card>
   );
 }
