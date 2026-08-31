@@ -198,21 +198,15 @@ export function ProjectCatalog() {
                 </div>
               </CardContent>
 
-              <CardFooter className="pt-2 border-t border-slate-800/60 flex gap-2">
-                <Link href={`/proyectos/${project.id}`} className="flex-1">
+              <CardFooter className="pt-2 border-t border-slate-800/60">
+                <Link href={`/proyectos/${project.id}`} className="w-full">
                   <Button
                     variant="outline"
-                    className="w-full border-slate-800 text-slate-300 hover:bg-slate-800 text-xs h-9 font-medium"
+                    className="w-full border-slate-800 text-emerald-400 hover:bg-emerald-950/60 hover:border-emerald-800 hover:text-emerald-300 text-xs h-10 font-bold transition-all"
                   >
-                    Ver Detalle PDP
+                    Ver Detalle Completo del Proyecto
                   </Button>
                 </Link>
-                <Button
-                  onClick={() => handleOpenInvest(project)}
-                  className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs h-9"
-                >
-                  Invertir XAF
-                </Button>
               </CardFooter>
             </Card>
           );
