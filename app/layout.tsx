@@ -8,9 +8,9 @@ import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "EGCrece | Plataforma de Microinversión y Ahorro en Guinea Ecuatorial",
-  description: "Plataforma fintech para ahorro programado e inversión en proyectos locales en Franco CFA (XAF) con Supabase y seguridad bancaria.",
-  keywords: ["Guinea Ecuatorial", "Microinversión", "Ahorro", "FCFA", "XAF", "Fintech", "Mobile Money"],
+  title: "EGCrece | Plataforma de Inversión y Ahorro en Guinea Ecuatorial",
+  description: "Plataforma financiera e inmobiliaria para ahorro programado e inversión en cualquier proyecto en Guinea Ecuatorial en Franco CFA (XAF).",
+  keywords: ["Guinea Ecuatorial", "Inversión", "Ahorro", "FCFA", "XAF", "Muni Dinero", "CEMAC"],
 };
 
 export default function RootLayout({

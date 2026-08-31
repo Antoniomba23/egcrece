@@ -6,7 +6,7 @@ interface LogoProps {
   height?: number;
 }
 
-export function Logo({ className = "h-9 w-auto", width, height }: LogoProps) {
+export function Logo({ className = "h-14 w-auto", width, height }: LogoProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -44,9 +44,9 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-950/90 backdrop-blur-md">
-      <div className="container flex h-16 items-center justify-between px-4 sm:px-8">
+      <div className="container flex h-20 items-center justify-between px-4 sm:px-8">
         <Link href="/" className="flex items-center space-x-2">
-          <Logo className="h-8 sm:h-9 w-auto" />
+          <Logo className="h-12 sm:h-14 w-auto" />
         </Link>
 
         {/* Navegación Escritorio */}

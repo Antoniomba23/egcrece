@@ -68,7 +68,7 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md bg-slate-900 border-slate-800">
         <div className="flex justify-center pt-6 pb-2">
           <Link href="/">
-            <Logo className="h-10 w-auto" />
+            <Logo className="h-16 w-auto" />
           </Link>
         </div>
         <CardHeader className="space-y-1 pt-0">
