@@ -17,7 +17,7 @@ export default function HomePage() {
           </h1>
 
           <p className="mt-6 text-base sm:text-lg text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
-            Conectamos a inversores locales e internacionales con proyectos agroindustriales, energéticos, tecnológicos, comerciales, inmobiliarios y cualquier iniciativa empresarial en Guinea Ecuatorial.
+            Plataforma abierta en Guinea Ecuatorial donde cualquier persona puede presentar su proyecto para conseguir financiación, y cualquier persona puede invertir en los proyectos que le parezcan más rentables.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">

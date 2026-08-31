@@ -208,7 +208,7 @@ export default function PresentarProyectoPage() {
 
         <h1 className="text-3xl font-extrabold text-white">Presentar Proyecto y Buscar Financiación</h1>
         <p className="text-xs text-slate-400 mt-1">
-          Si dispone de una empresa, finca, desarrollo comercial, tecnológico o proyecto en Guinea Ecuatorial, complete esta solicitud para buscar financiación participativa de nuestra red de inversores.
+          Si tienes una idea, empresa o proyecto en Guinea Ecuatorial, puedes presentarlo en la plataforma para buscar financiación. Cualquier persona interesada podrá revisar tu proyecto e invertir directamente en él.
         </p>
       </div>
 

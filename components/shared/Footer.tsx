@@ -11,7 +11,7 @@ export function Footer() {
             <Logo className="h-14 w-auto" />
           </Link>
           <p className="text-xs text-slate-400 leading-relaxed">
-            Plataforma financiera e inmobiliaria para impulsar cualquier proyecto agroindustrial, energético, comercial, tecnológico o empresarial en Guinea Ecuatorial y la zona CEMAC.
+            Plataforma abierta donde cualquier persona puede presentar su proyecto o invertir en iniciativas rentables en Guinea Ecuatorial.
           </p>
         </div>
 
