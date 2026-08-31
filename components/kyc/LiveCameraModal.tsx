@@ -34,30 +34,48 @@ export function LiveCameraModal({ isOpen, onClose, target, onCapture, onOpenQrSy
         stream.getTracks().forEach((track) => track.stop());
       }
 
-      // Solicitud explícita de permiso de vídeo al navegador
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: mode,
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-        audio: false,
-      });
+      let mediaStream: MediaStream | null = null;
+      try {
+        // 1. Intentar con constraint ideal (facingMode)
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: mode,
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
+        });
+      } catch (constraintErr: any) {
+        // 2. Si falla por OverconstrainedError/NotFoundError (cámara de PC básica), fallback a video: true sin restricciones
+        console.warn("Fallback a video: true básico:", constraintErr);
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        });
+      }
 
-      setPermissionState("granted");
-      setStream(mediaStream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
+      if (mediaStream) {
+        setPermissionState("granted");
+        setStream(mediaStream);
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+        }
       }
     } catch (err: any) {
       console.error("Error o permiso de cámara denegado:", err);
       setPermissionState("denied");
       if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
         setCameraError(
-          "Permiso de Cámara Denegado. Por favor, habilite el acceso a la cámara en el icono de candado de la barra de direcciones de su navegador."
+          "Permiso de Cámara Denegado. Habilite el acceso a la cámara haciendo clic en el icono de candado o cámara situado en la barra de direcciones superior de su navegador."
+        );
+      } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+        setCameraError(
+          "No se detectó ninguna cámara conectada a este equipo. Puede utilizar el botón para escanear el código QR con su teléfono móvil."
         );
       } else {
-        setCameraError("No se pudo iniciar la cámara. Verifique que no esté en uso por otra aplicación.");
+        setCameraError(
+          "No se pudo iniciar la cámara. Verifique que no esté en uso por otra aplicación (como Zoom o Teams)."
+        );
       }
     }
   };
