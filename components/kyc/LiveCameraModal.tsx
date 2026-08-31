@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Camera, RefreshCw, X, Check, FlipHorizontal, Lock, AlertTriangle } from "lucide-react";
+import { Camera, RefreshCw, X, Check, FlipHorizontal, Lock, ShieldCheck, QrCode } from "lucide-react";
 
 interface LiveCameraModalProps {
   isOpen: boolean;
@@ -24,19 +24,21 @@ export function LiveCameraModal({ isOpen, onClose, target, onCapture, onOpenQrSy
   );
   const [permissionState, setPermissionState] = useState<"prompt" | "granted" | "denied">("prompt");
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [isRequesting, setIsRequesting] = useState<boolean>(false);
 
   const requestCameraPermission = async (mode: "user" | "environment") => {
     try {
+      setIsRequesting(true);
       setCameraError(null);
-      setPermissionState("prompt");
 
       if (stream) {
         stream.getTracks().forEach((track) => track.stop());
       }
 
       let mediaStream: MediaStream | null = null;
+
+      // 1. Primer intento: Restricciones ideales por modo de cámara
       try {
-        // 1. Intentar con constraint ideal (facingMode)
         mediaStream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: mode,
@@ -45,9 +47,9 @@ export function LiveCameraModal({ isOpen, onClose, target, onCapture, onOpenQrSy
           },
           audio: false,
         });
-      } catch (constraintErr: any) {
-        // 2. Si falla por OverconstrainedError/NotFoundError (cámara de PC básica), fallback a video: true sin restricciones
-        console.warn("Fallback a video: true básico:", constraintErr);
+      } catch (constraintErr) {
+        // 2. Segundo intento: Fallback genérico sin restricciones de hardware
+        console.warn("Fallback a video básico:", constraintErr);
         mediaStream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: false,
@@ -62,21 +64,24 @@ export function LiveCameraModal({ isOpen, onClose, target, onCapture, onOpenQrSy
         }
       }
     } catch (err: any) {
-      console.error("Error o permiso de cámara denegado:", err);
+      console.error("Error al acceder a la cámara:", err);
       setPermissionState("denied");
+
       if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
         setCameraError(
-          "Permiso de Cámara Denegado. Habilite el acceso a la cámara haciendo clic en el icono de candado o cámara situado en la barra de direcciones superior de su navegador."
+          "El acceso a la cámara fue denegado en su navegador. Para activarla, haga clic en el icono de Candado o Ajustes junto a la barra de direcciones."
         );
       } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
         setCameraError(
-          "No se detectó ninguna cámara conectada a este equipo. Puede utilizar el botón para escanear el código QR con su teléfono móvil."
+          "No se detectó ninguna cámara web conectada a su equipo. Utilice la opción de Código QR para capturar la imagen desde su dispositivo móvil."
         );
       } else {
         setCameraError(
-          "No se pudo iniciar la cámara. Verifique que no esté en uso por otra aplicación (como Zoom o Teams)."
+          "No se pudo iniciar la cámara. Verifique que otra aplicación (como Zoom, Teams o Skype) no la esté bloqueando."
         );
       }
+    } finally {
+      setIsRequesting(false);
     }
   };
 
@@ -85,7 +90,30 @@ export function LiveCameraModal({ isOpen, onClose, target, onCapture, onOpenQrSy
       const mode = target === "selfie" ? "user" : "environment";
       setFacingMode(mode);
       setCapturedImage(null);
-      requestCameraPermission(mode);
+      setCameraError(null);
+
+      // Comprobar estado de permiso previo en el navegador
+      if (typeof navigator !== "undefined" && navigator.permissions && navigator.permissions.query) {
+        navigator.permissions
+          .query({ name: "camera" as any })
+          .then((status) => {
+            if (status.state === "granted") {
+              requestCameraPermission(mode);
+            } else if (status.state === "denied") {
+              setPermissionState("denied");
+              setCameraError(
+                "El permiso de cámara está bloqueado en las opciones de su navegador para este sitio web."
+              );
+            } else {
+              setPermissionState("prompt");
+            }
+          })
+          .catch(() => {
+            setPermissionState("prompt");
+          });
+      } else {
+        setPermissionState("prompt");
+      }
     } else {
       if (stream) {
         stream.getTracks().forEach((track) => track.stop());
@@ -180,32 +208,87 @@ export function LiveCameraModal({ isOpen, onClose, target, onCapture, onOpenQrSy
             </span>
           </div>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={toggleCamera}
-            className="text-slate-300 hover:text-emerald-400 text-xs flex items-center space-x-1"
-          >
-            <FlipHorizontal className="h-4 w-4 mr-1" />
-            <span>Voltear</span>
-          </Button>
+          {permissionState === "granted" && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={toggleCamera}
+              className="text-slate-300 hover:text-emerald-400 text-xs flex items-center space-x-1"
+            >
+              <FlipHorizontal className="h-4 w-4 mr-1" />
+              <span>Voltear</span>
+            </Button>
+          )}
         </div>
 
         <div className="relative bg-black aspect-video flex items-center justify-center overflow-hidden">
-          {permissionState === "denied" || cameraError ? (
+          {permissionState === "prompt" && !stream ? (
+            <div className="p-6 text-center text-xs text-slate-300 space-y-4 max-w-sm mx-auto my-auto">
+              <div className="h-12 w-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto text-emerald-400">
+                <Camera className="h-6 w-6" />
+              </div>
+
+              <div>
+                <h3 className="font-bold text-white text-base">Autorizar Acceso a la Cámara</h3>
+                <p className="text-slate-400 text-xs mt-1 leading-relaxed">
+                  Para proceder con la verificación biométrica en vivo, presione el botón para que su navegador le pida confirmación de permisos.
+                </p>
+              </div>
+
+              <Button
+                onClick={() => requestCameraPermission(facingMode)}
+                disabled={isRequesting}
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-11 text-xs shadow-lg"
+              >
+                {isRequesting ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                    <span>Iniciando Cámara...</span>
+                  </>
+                ) : (
+                  <>
+                    <Camera className="h-4 w-4 mr-2" />
+                    <span>📷 Abrir y Permitir Cámara</span>
+                  </>
+                )}
+              </Button>
+
+              {onOpenQrSync && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    onClose();
+                    onOpenQrSync();
+                  }}
+                  className="w-full border-slate-800 text-slate-300 hover:bg-slate-800 text-xs h-9"
+                >
+                  <QrCode className="h-3.5 w-3.5 mr-2 text-emerald-400" />
+                  <span>📱 O Usar Cámara del Móvil (QR)</span>
+                </Button>
+              )}
+            </div>
+          ) : permissionState === "denied" || cameraError ? (
             <div className="p-6 text-center text-xs text-rose-300 space-y-3 max-w-sm mx-auto">
               <Lock className="h-8 w-8 text-rose-400 mx-auto" />
-              <p className="font-bold text-white text-sm">Permiso de Cámara Denegado o Sin Cámara</p>
+              <p className="font-bold text-white text-sm">Permiso de Cámara Denegado</p>
               <p className="leading-relaxed text-slate-300">{cameraError}</p>
-              
-              <div className="flex flex-col gap-2 pt-2">
+
+              <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 text-[11px] text-slate-400 text-left space-y-1">
+                <span className="font-bold text-amber-400 block">¿Cómo solucionar el bloqueo?:</span>
+                <p>1. Haga clic en el icono de <strong>Candado 🔒</strong> o Ajustes situado en la barra de direcciones de su navegador (arriba a la izquierda).</p>
+                <p>2. Cambie el permiso de <strong>Cámara</strong> a <strong>"Permitir"</strong>.</p>
+                <p>3. Haga clic en el botón Reintentar o refresque la página.</p>
+              </div>
+
+              <div className="flex flex-col gap-2 pt-1">
                 <Button
                   size="sm"
                   onClick={() => requestCameraPermission(facingMode)}
                   className="bg-slate-800 hover:bg-slate-700 text-white font-bold"
                 >
-                  Reintentar Permiso de Cámara
+                  Reintentar Solicitar Permiso
                 </Button>
 
                 {onOpenQrSync && (
@@ -217,6 +300,7 @@ export function LiveCameraModal({ isOpen, onClose, target, onCapture, onOpenQrSy
                     }}
                     className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center space-x-1"
                   >
+                    <QrCode className="h-4 w-4 mr-1" />
                     <span>📱 Usar Cámara del Móvil (Escanear QR)</span>
                   </Button>
                 )}
@@ -279,7 +363,7 @@ export function LiveCameraModal({ isOpen, onClose, target, onCapture, onOpenQrSy
           ) : (
             <Button
               onClick={takeSnapshot}
-              disabled={permissionState === "denied"}
+              disabled={permissionState !== "granted" || !stream}
               className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-12 px-8 rounded-full shadow-xl flex items-center space-x-2"
             >
               <Camera className="h-5 w-5" />
