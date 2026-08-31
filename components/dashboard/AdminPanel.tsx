@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { formatCurrency } from "@/lib/utils";
 import { EditProjectModal } from "@/components/dashboard/EditProjectModal";
 import { CreateProjectModal } from "@/components/dashboard/CreateProjectModal";
-import { ShieldCheck, Users, FileCheck, CheckCircle2, XCircle, RefreshCw, Edit, TrendingUp, AlertTriangle, ArrowUpRight, Lock, Unlock, Settings, Activity, PlusCircle, Search } from "lucide-react";
+import { ShieldCheck, Users, FileCheck, CheckCircle2, XCircle, RefreshCw, Edit, TrendingUp, AlertTriangle, ArrowUpRight, Lock, Unlock, Settings, Activity, PlusCircle, Search, Building2 } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -47,14 +47,37 @@ interface WithdrawalRequest {
   created_at: string;
 }
 
+interface ProjectProposal {
+  id: string;
+  user_id: string | null;
+  promoter_name: string;
+  phone: string;
+  email: string;
+  title: string;
+  category: string;
+  location: string;
+  target_amount: number;
+  promoter_contribution: number;
+  expected_return: number;
+  duration_months: number;
+  description: string;
+  business_model?: string;
+  risks_guarantees?: string;
+  dossier_url?: string;
+  status: "pending" | "under_review" | "approved" | "rejected";
+  created_at: string;
+}
+
 export function AdminPanel() {
-  const [activeTab, setActiveTab] = useState<"tasks" | "projects" | "users" | "yields" | "settings">("tasks");
+  const [activeTab, setActiveTab] = useState<"tasks" | "proposals" | "projects" | "users" | "yields" | "settings">("tasks");
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
   const [projects, setProjects] = useState<DBProject[]>([]);
+  const [proposals, setProposals] = useState<ProjectProposal[]>([]);
   const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [actionUserId, setActionUserId] = useState<string | null>(null);
   const [actionWthId, setActionWthId] = useState<string | null>(null);
+  const [actionPropId, setActionPropId] = useState<string | null>(null);
   const [userSearch, setUserSearch] = useState<string>("");
   const [editingProject, setEditingProject] = useState<any | null>(null);
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
@@ -92,7 +115,14 @@ export function AdminPanel() {
         .order("created_at", { ascending: false });
       setProjects(projData || []);
 
-      // 4. Ajustes globales
+      // 4. Propuestas de Proyectos de Promotores
+      const { data: propData } = await supabase
+        .from("project_proposals")
+        .select("*")
+        .order("created_at", { ascending: false });
+      setProposals(propData || []);
+
+      // 5. Ajustes globales
       const { data: settingsData } = await supabase.from("platform_settings").select("*");
       if (settingsData) {
         const feeSetting = settingsData.find((s) => s.key === "withdrawal_fee_percent");
@@ -244,6 +274,71 @@ export function AdminPanel() {
       alert(`Error actualizando rol: ${err.message}`);
     } finally {
       setActionUserId(null);
+    }
+  };
+
+  // Aprobar propuesta y publicar automáticamente en el Catálogo de Proyectos
+  const handleApproveProposalAndPublish = async (prop: ProjectProposal) => {
+    try {
+      setActionPropId(prop.id);
+
+      // 1. Insertar el nuevo proyecto en la tabla public.projects
+      const { data: newProject, error: projErr } = await supabase
+        .from("projects")
+        .insert({
+          title: prop.title,
+          category: prop.category,
+          location: prop.location,
+          target_amount: prop.target_amount,
+          raised_amount: prop.promoter_contribution || 0,
+          expected_return: prop.expected_return,
+          duration_months: prop.duration_months,
+          risk_level: "Moderado",
+          status: "active",
+          description: prop.description,
+          business_model: prop.business_model,
+          risks_guarantees: prop.risks_guarantees,
+        })
+        .select()
+        .single();
+
+      if (projErr) throw projErr;
+
+      // 2. Actualizar estado de la propuesta a 'approved'
+      await supabase
+        .from("project_proposals")
+        .update({ status: "approved" })
+        .eq("id", prop.id);
+
+      await createAuditLog("PROPOSAL_APPROVED_AND_PUBLISHED", "project_proposal", prop.id, {
+        project_id: newProject.id,
+        title: prop.title,
+      });
+
+      alert(`¡La propuesta "${prop.title}" fue APROBADA y PUBLICADA exitosamente en el catálogo de proyectos!`);
+      await fetchAdminData();
+    } catch (err: any) {
+      alert(`Error al aprobar propuesta: ${err.message}`);
+    } finally {
+      setActionPropId(null);
+    }
+  };
+
+  const handleRejectProposal = async (proposalId: string) => {
+    try {
+      setActionPropId(proposalId);
+      await supabase
+        .from("project_proposals")
+        .update({ status: "rejected" })
+        .eq("id", proposalId);
+
+      await createAuditLog("PROPOSAL_REJECTED", "project_proposal", proposalId);
+      alert("Solicitud de proyecto marcada como RECHAZADA.");
+      await fetchAdminData();
+    } catch (err: any) {
+      alert(`Error al rechazar propuesta: ${err.message}`);
+    } finally {
+      setActionPropId(null);
     }
   };
 
@@ -410,6 +505,14 @@ export function AdminPanel() {
             }`}
           >
             Bandeja Tareas Críticas ({pendingWithdrawalsCount + pendingKycCount})
+          </button>
+          <button
+            onClick={() => setActiveTab("proposals")}
+            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all shrink-0 ${
+              activeTab === "proposals" ? "bg-emerald-600 text-white" : "bg-slate-950 text-slate-400 hover:text-white"
+            }`}
+          >
+            Solicitudes Promotores ({proposals.filter((p) => p.status === "pending").length})
           </button>
           <button
             onClick={() => setActiveTab("projects")}
@@ -603,6 +706,104 @@ export function AdminPanel() {
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Pestaña: Solicitudes de Proyectos Recibidas (Promotores & Emprendedores) */}
+        {activeTab === "proposals" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-bold text-white flex items-center space-x-2">
+                <Building2 className="h-4 w-4 text-emerald-400" />
+                <span>Solicitudes de Financiación de Promotores Recibidas ({proposals.length})</span>
+              </h4>
+            </div>
+
+            <div className="overflow-x-auto rounded-lg border border-slate-800 bg-slate-950">
+              <table className="w-full text-left text-xs text-slate-300">
+                <thead className="bg-slate-900 text-slate-400 uppercase tracking-wider border-b border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3">Proyecto / Promotor</th>
+                    <th className="px-4 py-3">Ubicación</th>
+                    <th className="px-4 py-3">Capital Requerido</th>
+                    <th className="px-4 py-3">Aportación Promotor</th>
+                    <th className="px-4 py-3">TIR Ofrecida</th>
+                    <th className="px-4 py-3">Estado</th>
+                    <th className="px-4 py-3 text-right">Acción Intervención</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60">
+                  {proposals.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
+                        No hay solicitudes de financiación registradas por promotores actualmente.
+                      </td>
+                    </tr>
+                  ) : (
+                    proposals.map((prop) => (
+                      <tr key={prop.id} className="hover:bg-slate-900/40">
+                        <td className="px-4 py-3">
+                          <span className="font-bold text-white block">{prop.title}</span>
+                          <span className="text-[11px] text-slate-400">
+                            Promotor: {prop.promoter_name} | {prop.phone} ({prop.email})
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-slate-300">
+                          <span className="block font-medium">{prop.category}</span>
+                          <span className="text-[11px] text-slate-400">{prop.location}</span>
+                        </td>
+                        <td className="px-4 py-3 font-bold text-emerald-400">{formatCurrency(prop.target_amount)}</td>
+                        <td className="px-4 py-3 font-semibold text-teal-400">{formatCurrency(prop.promoter_contribution || 0)}</td>
+                        <td className="px-4 py-3 font-bold text-white">+{prop.expected_return}%</td>
+                        <td className="px-4 py-3">
+                          <Badge
+                            variant="outline"
+                            className={`text-[10px] ${
+                              prop.status === "approved"
+                                ? "bg-emerald-950 text-emerald-400 border-emerald-800"
+                                : prop.status === "rejected"
+                                ? "bg-rose-950 text-rose-400 border-rose-800"
+                                : "bg-amber-950 text-amber-400 border-amber-800"
+                            }`}
+                          >
+                            {prop.status.toUpperCase()}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-right space-x-2">
+                          {prop.status === "pending" && (
+                            <>
+                              <Button
+                                size="sm"
+                                disabled={actionPropId === prop.id}
+                                onClick={() => handleApproveProposalAndPublish(prop)}
+                                className="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] h-7 px-2.5 font-bold"
+                              >
+                                <CheckCircle2 className="h-3 w-3 mr-1" /> Aprobar y Publicar
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                disabled={actionPropId === prop.id}
+                                onClick={() => handleRejectProposal(prop.id)}
+                                className="text-[11px] h-7 px-2.5"
+                              >
+                                <XCircle className="h-3 w-3 mr-1" /> Rechazar
+                              </Button>
+                            </>
+                          )}
+                          {prop.status === "approved" && (
+                            <span className="text-[11px] text-emerald-400 font-bold">✓ Proyecto Publicado</span>
+                          )}
+                          {prop.status === "rejected" && (
+                            <span className="text-[11px] text-rose-400 font-semibold">Desestimado</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         )}

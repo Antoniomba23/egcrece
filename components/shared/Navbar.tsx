@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
-import { Wallet, ShieldCheck, PieChart, LogOut, LogIn, UserPlus, Menu, X, Home, Calculator, Building2, UserCheck, User as UserIcon } from "lucide-react";
+import { Wallet, ShieldCheck, PieChart, LogOut, LogIn, UserPlus, Menu, X, Home, Calculator, Building2, UserCheck, User as UserIcon, Sparkles } from "lucide-react";
 import { Logo } from "@/components/shared/Logo";
 
 export function Navbar() {
@@ -66,6 +66,14 @@ export function Navbar() {
             }`}
           >
             Proyectos
+          </Link>
+          <Link
+            href="/presentar-proyecto"
+            className={`transition-colors hover:text-emerald-400 ${
+              pathname === "/presentar-proyecto" ? "text-emerald-400 font-semibold" : ""
+            }`}
+          >
+            Buscar Financiación
           </Link>
           {user && (
             <>
@@ -184,6 +192,16 @@ export function Navbar() {
             >
               <Building2 className="h-4 w-4" />
               <span>Catálogo de Proyectos</span>
+            </Link>
+
+            <Link
+              href="/presentar-proyecto"
+              className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                pathname === "/presentar-proyecto" ? "bg-emerald-950/80 text-emerald-400 font-bold" : "text-slate-300 hover:bg-slate-900"
+              }`}
+            >
+              <Sparkles className="h-4 w-4 text-emerald-400" />
+              <span>Buscar Financiación / Presentar Proyecto</span>
             </Link>
 
             {user && (

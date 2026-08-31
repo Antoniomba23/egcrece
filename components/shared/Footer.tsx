@@ -20,6 +20,7 @@ export function Footer() {
           <ul className="space-y-2 text-xs">
             <li><Link href="/simulador" className="hover:text-emerald-400 transition-colors">Simulador de Interés</Link></li>
             <li><Link href="/proyectos" className="hover:text-emerald-400 transition-colors">Catálogo de Proyectos</Link></li>
+            <li><Link href="/presentar-proyecto" className="hover:text-emerald-400 transition-colors font-bold text-emerald-400">Buscar Financiación / Promotores</Link></li>
             <li><Link href="/dashboard" className="hover:text-emerald-400 transition-colors">Panel Privado</Link></li>
             <li><Link href="/kyc" className="hover:text-emerald-400 transition-colors">Verificación de Identidad</Link></li>
           </ul>
