@@ -295,12 +295,12 @@ export function KycUploader({ userId }: { userId: string }) {
   }
 
   return (
-    <Card className="max-w-3xl mx-auto bg-slate-900 border-slate-800 text-white shadow-2xl">
-      <CardHeader className="border-b border-slate-800/80 pb-4">
+    <Card className="max-w-3xl mx-auto bg-slate-900 border-slate-800 text-white shadow-2xl w-full max-w-full overflow-x-hidden box-border">
+      <CardHeader className="border-b border-slate-800/80 pb-4 px-3 sm:px-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <CardTitle className="text-emerald-400 flex items-center space-x-2">
-              <ShieldCheck className="h-6 w-6 text-emerald-400" />
+            <CardTitle className="text-emerald-400 flex items-center space-x-2 text-lg sm:text-xl">
+              <ShieldCheck className="h-6 w-6 text-emerald-400 flex-shrink-0" />
               <span>Verificación de Identidad con IA (24/7)</span>
             </CardTitle>
             <CardDescription className="text-xs text-slate-300 mt-1">
@@ -323,7 +323,7 @@ export function KycUploader({ userId }: { userId: string }) {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6 pt-6">
+      <CardContent className="space-y-6 pt-6 px-3 sm:px-6 w-full max-w-full overflow-x-hidden box-border">
         {/* Banner Informativo */}
         <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2 text-xs">
           <div className="flex items-center space-x-2 text-emerald-400 font-bold">

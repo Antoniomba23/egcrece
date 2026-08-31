@@ -20,7 +20,7 @@ export default async function KycPage() {
     .single();
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
+    <div className="space-y-8 max-w-4xl mx-auto w-full max-w-full overflow-x-hidden px-1 sm:px-4">
       <div>
         <h1 className="text-2xl font-bold text-white">Verificación KYC y Cumplimiento</h1>
         <p className="text-xs text-slate-400 mt-1">
