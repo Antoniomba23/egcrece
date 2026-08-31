@@ -148,6 +148,20 @@ export default function RegisterPage() {
                 className="mt-1"
               />
             </div>
+
+            <div>
+              <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Repita su contraseña"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                minLength={8}
+                required
+                className="mt-1"
+              />
+            </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-3">
             <Button
