@@ -315,13 +315,13 @@ export default function PresentarProyectoPage() {
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full mt-1 h-10 rounded-md border border-slate-800 bg-slate-950 px-3 text-xs text-white font-bold"
                   >
-                    <option value="Agroindustria">Agroindustria & Agricultura 🌾</option>
-                    <option value="Energía Renovable">Energía Renovable & Solar ☀️</option>
-                    <option value="Comercio & Servicios">Comercio & Servicios 🏪</option>
-                    <option value="Tecnología & Fintech">Tecnología & Digital 💻</option>
-                    <option value="Inmobiliario & Construcción">Inmobiliario & Vivienda 🏢</option>
-                    <option value="Infraestructura & Logística">Infraestructura & Logística 🚛</option>
-                    <option value="Otro Sector Empresarial">Otro Sector Empresarial 🚀</option>
+                    <option value="Agroindustria">Agroindustria & Agricultura</option>
+                    <option value="Energía Renovable">Energía Renovable & Solar</option>
+                    <option value="Comercio & Servicios">Comercio & Servicios</option>
+                    <option value="Tecnología & Fintech">Tecnología & Digital</option>
+                    <option value="Inmobiliario & Construcción">Inmobiliario & Vivienda</option>
+                    <option value="Infraestructura & Logística">Infraestructura & Logística</option>
+                    <option value="Otro Sector Empresarial">Otro Sector Empresarial</option>
                   </select>
                 </div>
 
