@@ -68,26 +68,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       if (!error && data) {
         setProject(data);
       } else {
-        // En caso de id semilla que aún no esté en base de datos
-        setProject({
-          id: projectId,
-          title: "Expansión Agrícola Bioko Norte",
-          category: "Agroindustria",
-          location: "Malabo, Guinea Ecuatorial",
-          target_amount: 50000000,
-          raised_amount: 32500000,
-          expected_return: 10.5,
-          duration_months: 18,
-          risk_level: "Bajo",
-          status: "active",
-          description: "Este proyecto impulsa la modernización agrícola y agroindustrial en la isla de Bioko Norte, Guinea Ecuatorial. El capital captado se destina a la instalación de sistemas de riego automatizados, almacenamiento refrigerado y mecanización de la cosecha de productos locales para abastecer los mercados de Malabo y la región CEMAC.",
-          business_model: "Sustitución de importaciones alimentarias mediante producción sostenible local en FCFA con contratos de compra off-take.",
-          risks_guarantees: "Terreno registrado pignorado inscrito en el Registro de la Propiedad de Malabo y póliza de seguro integral contratada.",
-          image_url: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?q=80&w=1200&auto=format&fit=crop",
-        });
+        setProject(null);
       }
     } catch (err) {
       console.error("Error al cargar detalle del proyecto:", err);
+      setProject(null);
     } finally {
       setLoading(false);
     }

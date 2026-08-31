@@ -23,49 +23,13 @@ export interface InvestmentProject {
   riskLevel: "Bajo" | "Moderado" | "Alto";
 }
 
-const mockProjects: InvestmentProject[] = [
-  {
-    id: "proj-1",
-    title: "Expansión Agrícola Bioko Norte",
-    category: "Agroindustria",
-    location: "Malabo, Guinea Ecuatorial",
-    targetAmount: 50000000,
-    raisedAmount: 32500000,
-    expectedReturn: 10.5,
-    durationMonths: 18,
-    riskLevel: "Bajo",
-  },
-  {
-    id: "proj-2",
-    title: "Parque Solar Fotovoltaico Bata",
-    category: "Energía Renovable",
-    location: "Bata, Región Continental",
-    targetAmount: 120000000,
-    raisedAmount: 84000000,
-    expectedReturn: 12.0,
-    durationMonths: 24,
-    riskLevel: "Moderado",
-  },
-  {
-    id: "proj-3",
-    title: "Centro Logístico Puerto de Malabo",
-    category: "Infraestructura",
-    location: "Puerto de Malabo",
-    targetAmount: 85000000,
-    raisedAmount: 41000000,
-    expectedReturn: 9.2,
-    durationMonths: 12,
-    riskLevel: "Bajo",
-  },
-];
-
 export function ProjectCatalog() {
-  const [projects, setProjects] = useState<InvestmentProject[]>(mockProjects);
+  const [projects, setProjects] = useState<InvestmentProject[]>([]);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isCreateOpen, setIsCreateOpen] = useState<boolean>(false);
   const [selectedProject, setSelectedProject] = useState<InvestmentProject | null>(null);
   const [isInvestOpen, setIsInvestOpen] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const supabase = createClient();
 
@@ -90,6 +54,8 @@ export function ProjectCatalog() {
           riskLevel: p.risk_level,
         }));
         setProjects(mapped);
+      } else {
+        setProjects([]);
       }
 
       const { data: { user } } = await supabase.auth.getUser();
@@ -105,7 +71,8 @@ export function ProjectCatalog() {
         }
       }
     } catch (err) {
-      // Fallback a mockProjects
+      console.error("Error al cargar proyectos de la base de datos:", err);
+      setProjects([]);
     } finally {
       setLoading(false);
     }
@@ -151,8 +118,31 @@ export function ProjectCatalog() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {projects.map((project) => {
+      {projects.length === 0 ? (
+        <div className="p-8 sm:p-12 rounded-2xl bg-slate-900 border border-slate-800 text-center space-y-4 my-6 shadow-xl">
+          <div className="h-14 w-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto text-emerald-400">
+            <Building2 className="h-7 w-7" />
+          </div>
+          <div className="space-y-1.5 max-w-md mx-auto">
+            <h3 className="text-lg font-bold text-white">No hay proyectos activos en la Base de Datos</h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Actualmente no existen proyectos publicados en la base de datos oficial. Los nuevos proyectos autorizados por la administración se reflejarán automáticamente en esta sección.
+            </p>
+          </div>
+
+          {isAdmin && (
+            <Button
+              onClick={() => setIsCreateOpen(true)}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-10 px-6 shadow-lg mt-2"
+            >
+              <PlusCircle className="h-4 w-4 mr-2" />
+              <span>Publicar Nuevo Proyecto en la Base de Datos</span>
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {projects.map((project) => {
           const progressPercentage = Math.min(
             100,
             Math.round((project.raisedAmount / project.targetAmount) * 100)
@@ -212,6 +202,7 @@ export function ProjectCatalog() {
           );
         })}
       </div>
+      )}
 
       {/* Modal para Administradores: Crear Proyecto */}
       <CreateProjectModal
