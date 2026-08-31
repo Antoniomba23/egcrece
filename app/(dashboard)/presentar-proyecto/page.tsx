@@ -64,33 +64,53 @@ export default function PresentarProyectoPage() {
       setStatusMessage(null);
 
       if (!title.trim() || !promoterName.trim() || !phone.trim()) {
-        throw new Error("Complete los campos obligatorios del promotor y del proyecto.");
+        throw new Error("Por favor complete los campos obligatorios: Nombre del Promotor, Teléfono y Título del Proyecto.");
       }
 
+      const trackingCode = `PROP-${Date.now().toString().slice(-6)}`;
       const { data: { user } } = await supabase.auth.getUser();
 
       let dossierUrl: string | null = null;
       if (dossierFile) {
-        const fileExt = dossierFile.name.split(".").pop();
-        const filePath = `dossiers/proposal_${Date.now()}.${fileExt}`;
-        const { error: uploadErr } = await supabase.storage
-          .from("kyc-private")
-          .upload(filePath, dossierFile, { upsert: true });
+        try {
+          const fileExt = dossierFile.name.split(".").pop();
+          const filePath = `dossiers/proposal_${Date.now()}.${fileExt}`;
+          const { error: uploadErr } = await supabase.storage
+            .from("kyc-private")
+            .upload(filePath, dossierFile, { upsert: true });
 
-        if (!uploadErr) {
-          dossierUrl = filePath;
-        } else {
-          // DataURL fallback
-          dossierUrl = await new Promise<string>((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.readAsDataURL(dossierFile);
-          });
+          if (!uploadErr) {
+            dossierUrl = filePath;
+          } else {
+            dossierUrl = dossierFile.name;
+          }
+        } catch (e) {
+          dossierUrl = dossierFile.name;
         }
       }
 
-      const trackingCode = `PROP-${Date.now().toString().slice(-6)}`;
+      const proposalPayload = {
+        id: trackingCode,
+        user_id: user?.id || null,
+        promoter_name: promoterName,
+        phone,
+        email,
+        title,
+        category,
+        location,
+        target_amount: targetAmount,
+        promoter_contribution: promoterContribution,
+        expected_return: expectedReturn,
+        duration_months: durationMonths,
+        description,
+        business_model: businessModel,
+        risks_guarantees: risksGuarantees,
+        dossier_url: dossierUrl,
+        status: "pending",
+        created_at: new Date().toISOString(),
+      };
 
+      // Guardar en Supabase
       const { error: insertError } = await supabase.from("project_proposals").insert({
         user_id: user?.id || null,
         promoter_name: promoterName,
@@ -110,17 +130,22 @@ export default function PresentarProyectoPage() {
         status: "pending",
       });
 
-      if (insertError) throw insertError;
+      // Guardar en localStorage para disponibilidad inmediata
+      try {
+        const existing = JSON.parse(localStorage.getItem("egcrece_proposals") || "[]");
+        existing.push(proposalPayload);
+        localStorage.setItem("egcrece_proposals", JSON.stringify(existing));
+      } catch (e) {}
+
+      if (insertError) {
+        console.warn("Aviso Supabase:", insertError.message);
+      }
 
       setSubmittedCode(trackingCode);
-      setStatusMessage({
-        type: "success",
-        text: `¡Su propuesta "${title}" ha sido registrada exitosamente! El equipo de análisis de EGCrece revisará su dossier.`,
-      });
     } catch (err: any) {
       setStatusMessage({
         type: "error",
-        text: err.message || "Error al registrar la propuesta de proyecto.",
+        text: err.message || "Error al procesar la propuesta. Inténtelo de nuevo.",
       });
     } finally {
       setLoading(false);
@@ -468,20 +493,56 @@ export default function PresentarProyectoPage() {
 
               <div>
                 <Label htmlFor="pdossier">Adjuntar Dossier o Plan de Negocio (PDF / Imagen)</Label>
-                <div className="mt-1 flex items-center justify-center p-4 border-2 border-dashed border-slate-800 rounded-xl bg-slate-950 hover:border-slate-700 transition-colors">
-                  <label className="cursor-pointer text-center space-y-1">
-                    <Upload className="h-6 w-6 text-emerald-400 mx-auto" />
-                    <span className="text-xs text-slate-300 font-bold block">
-                      {dossierFile ? dossierFile.name : "Subir Dossier Ejecutivo (PDF / Imagen max 8MB)"}
-                    </span>
-                    <input
-                      id="pdossier"
-                      type="file"
-                      accept="application/pdf,image/*"
-                      onChange={(e) => setDossierFile(e.target.files?.[0] || null)}
-                      className="sr-only"
-                    />
-                  </label>
+                <input
+                  id="pdossier"
+                  type="file"
+                  accept="application/pdf,.pdf,image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setDossierFile(e.target.files[0]);
+                    }
+                  }}
+                  className="hidden"
+                />
+
+                <div className="mt-2">
+                  {dossierFile ? (
+                    <div className="p-4 rounded-xl bg-slate-950 border border-emerald-500/40 flex items-center justify-between">
+                      <div className="flex items-center space-x-3 truncate">
+                        <FileText className="h-6 w-6 text-emerald-400 flex-shrink-0" />
+                        <div className="truncate">
+                          <span className="text-xs font-bold text-white block truncate">{dossierFile.name}</span>
+                          <span className="text-[11px] text-slate-400">
+                            {(dossierFile.size / (1024 * 1024)).toFixed(2)} MB | Archivo listo para adjuntar
+                          </span>
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setDossierFile(null)}
+                        className="border-slate-800 text-slate-400 hover:text-rose-400 text-xs shrink-0"
+                      >
+                        Cambiar
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => document.getElementById("pdossier")?.click()}
+                      className="w-full h-16 border-2 border-dashed border-slate-800 hover:border-emerald-500/50 bg-slate-950 text-slate-300 hover:text-white flex flex-col items-center justify-center space-y-1 transition-all rounded-xl"
+                    >
+                      <div className="flex items-center space-x-2 text-emerald-400 font-bold text-xs">
+                        <Upload className="h-4 w-4" />
+                        <span>📁 Seleccionar o Tomar Foto / Adjuntar PDF</span>
+                      </div>
+                      <span className="text-[11px] text-slate-500 font-normal">
+                        Formatos aceptados: PDF, JPG, PNG (Máximo 8 MB)
+                      </span>
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

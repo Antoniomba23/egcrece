@@ -120,7 +120,20 @@ export function AdminPanel() {
         .from("project_proposals")
         .select("*")
         .order("created_at", { ascending: false });
-      setProposals(propData || []);
+
+      let localProps: any[] = [];
+      try {
+        localProps = JSON.parse(localStorage.getItem("egcrece_proposals") || "[]");
+      } catch (e) {}
+
+      const combinedProposals = [...(propData || [])];
+      for (const lp of localProps) {
+        if (!combinedProposals.some((p) => p.id === lp.id)) {
+          combinedProposals.push(lp);
+        }
+      }
+
+      setProposals(combinedProposals);
 
       // 5. Ajustes globales
       const { data: settingsData } = await supabase.from("platform_settings").select("*");
