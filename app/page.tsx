@@ -9,11 +9,6 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-16 pb-12 md:pt-24 md:pb-20 border-b border-slate-800/60 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
         <div className="container px-4 sm:px-8 mx-auto text-center relative z-10 max-w-4xl">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold mb-6">
-            <Sparkles className="h-3.5 w-3.5" />
-            <span>Plataforma Financiera de Inversión en Guinea Ecuatorial</span>
-          </div>
-
           <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight">
             Invierte en el futuro de <br className="hidden sm:inline" />
             <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 bg-clip-text text-transparent">
