@@ -65,25 +65,19 @@ export function WithdrawModal({ isOpen, onClose, availableBalance, onWithdrawCom
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Debe iniciar sesión.");
 
-      // Verificar rol, estado y KYC del perfil
-      const { data: profile, error: profErr } = await supabase
+      // Verificar rol y KYC del perfil
+      const { data: profile } = await supabase
         .from("profiles")
-        .select("role, status, kyc_status")
+        .select("role, kyc_status")
         .eq("id", user.id)
         .single();
 
-      if (profErr || !profile) throw new Error("Error al obtener el perfil de usuario.");
-
-      if (profile.role === "admin") {
+      if (profile?.role === "admin") {
         throw new Error("Separación de Funciones (SoD): Los administradores no pueden solicitar retiros desde cuentas corporativas.");
       }
 
-      if (profile.status !== "active") {
-        throw new Error("Su cuenta se encuentra suspendida o congelada por seguridad.");
-      }
-
-      if (profile.kyc_status !== "approved") {
-        throw new Error("Debe completar la verificación de identidad (KYC) antes de solicitar retiros de fondos.");
+      if (profile?.kyc_status !== "approved") {
+        throw new Error("Debe completar la verificación de identidad (KYC) para activar su cuenta antes de solicitar retiros de fondos.");
       }
 
       const referenceCode = `WTH-${Date.now().toString().slice(-6)}`;

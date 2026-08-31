@@ -43,10 +43,10 @@ export function InvestModal({ isOpen, onClose, project, onInvestmentComplete }: 
         throw new Error("Debe iniciar sesión para realizar una inversión.");
       }
 
-      // 1. Obtener perfil del inversor para verificar KYC, Rol y Estado
+      // 1. Obtener perfil del inversor para verificar KYC y Rol
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role, status, kyc_status")
+        .select("role, kyc_status")
         .eq("id", user.id)
         .single();
 
@@ -54,12 +54,8 @@ export function InvestModal({ isOpen, onClose, project, onInvestmentComplete }: 
         throw new Error("Separación de Funciones (SoD): Los administradores no pueden ejecutar inversiones desde la cuenta corporativa. Regístrese con una cuenta de Inversor.");
       }
 
-      if (profile?.status !== "active") {
-        throw new Error("Su cuenta se encuentra suspendida o congelada por motivos de seguridad.");
-      }
-
       if (profile?.kyc_status !== "approved") {
-        throw new Error("Su cuenta debe estar verificada en KYC para poder invertir.");
+        throw new Error("Debe completar su verificación de identidad (KYC) para activar su cuenta antes de realizar una inversión.");
       }
 
       // 2. Insertar transacción atómica de inversión en el ledger

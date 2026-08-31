@@ -65,10 +65,10 @@ export function DepositModal({ isOpen, onClose, onDepositComplete }: DepositModa
         throw new Error("Debe iniciar sesión para realizar un depósito.");
       }
 
-      // 1. Verificar SoD y estado del perfil
+      // 1. Verificar SoD del perfil
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role, status")
+        .select("role")
         .eq("id", user.id)
         .single();
 
@@ -76,10 +76,6 @@ export function DepositModal({ isOpen, onClose, onDepositComplete }: DepositModa
         throw new Error(
           "Separación de Funciones (SoD): Los administradores no pueden realizar depósitos a título personal. Use una cuenta de Inversor."
         );
-      }
-
-      if (profile?.status !== "active") {
-        throw new Error("Su cuenta se encuentra suspendida o congelada por seguridad.");
       }
 
       // 2. Generar código de referencia según el método de pago

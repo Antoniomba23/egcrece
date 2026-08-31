@@ -66,26 +66,23 @@ export function InvestmentCheckoutModal({
       }
 
       // 1. Obtener perfil del usuario para validar KYC, Rol y Saldo Disponible
-      const { data: profile, error: profErr } = await supabase
+      const { data: profile } = await supabase
         .from("profiles")
-        .select("role, status, kyc_status")
+        .select("role, kyc_status")
         .eq("id", user.id)
         .single();
 
-      if (profErr || !profile) throw new Error("Error al obtener el perfil de usuario.");
+      const userRole = profile?.role || "investor";
+      const kycStatus = profile?.kyc_status || "pending";
 
-      if (profile.role === "admin") {
+      if (userRole === "admin") {
         throw new Error("Separación de Funciones (SoD): Los administradores no pueden ejecutar inversiones desde la cuenta corporativa. Use una cuenta de Inversor.");
       }
 
-      if (profile.status !== "active") {
-        throw new Error("Su cuenta se encuentra suspendida o congelada por seguridad.");
-      }
-
-      if (profile.kyc_status !== "approved") {
+      if (kycStatus !== "approved") {
         setStatusMessage({
           type: "warning",
-          text: "Su identidad no ha sido verificada. Debe subir su DNI/Pasaporte en la sección KYC antes de invertir.",
+          text: "Debe completar la verificación de identidad (KYC) para activar su cuenta antes de realizar inversiones.",
         });
         return;
       }
