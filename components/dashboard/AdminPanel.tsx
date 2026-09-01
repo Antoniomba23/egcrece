@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { formatCurrency } from "@/lib/utils";
 import { EditProjectModal } from "@/components/dashboard/EditProjectModal";
 import { CreateProjectModal } from "@/components/dashboard/CreateProjectModal";
-import { ShieldCheck, Users, FileCheck, CheckCircle2, XCircle, RefreshCw, Edit, TrendingUp, AlertTriangle, ArrowUpRight, Lock, Unlock, Settings, Activity, PlusCircle, Search, Building2 } from "lucide-react";
+import { ProposalDetailModal } from "@/components/dashboard/ProposalDetailModal";
+import { ShieldCheck, Users, FileCheck, CheckCircle2, XCircle, RefreshCw, Edit, TrendingUp, AlertTriangle, ArrowUpRight, Lock, Unlock, Settings, Activity, PlusCircle, Search, Building2, FileSearch } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -83,6 +84,8 @@ export function AdminPanel() {
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [isCreateOpen, setIsCreateOpen] = useState<boolean>(false);
   const [yieldingProjectId, setYieldingProjectId] = useState<string | null>(null);
+  const [selectedProposal, setSelectedProposal] = useState<ProjectProposal | null>(null);
+  const [isProposalModalOpen, setIsProposalModalOpen] = useState<boolean>(false);
 
   // Configuraciones globales
   const [feePercent, setFeePercent] = useState<number>(1.5);
@@ -784,6 +787,17 @@ export function AdminPanel() {
                           </Badge>
                         </td>
                         <td className="px-4 py-3 text-right space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedProposal(prop);
+                              setIsProposalModalOpen(true);
+                            }}
+                            className="border-slate-700 hover:border-emerald-500 text-emerald-400 text-[11px] h-7 px-2.5 font-semibold"
+                          >
+                            <FileSearch className="h-3 w-3 mr-1" /> Ver Expediente
+                          </Button>
                           {prop.status === "pending" && (
                             <>
                               <Button
@@ -806,10 +820,10 @@ export function AdminPanel() {
                             </>
                           )}
                           {prop.status === "approved" && (
-                            <span className="text-[11px] text-emerald-400 font-bold">✓ Proyecto Publicado</span>
+                            <span className="text-[11px] text-emerald-400 font-bold ml-2">✓ Publicado</span>
                           )}
                           {prop.status === "rejected" && (
-                            <span className="text-[11px] text-rose-400 font-semibold">Desestimado</span>
+                            <span className="text-[11px] text-rose-400 font-semibold ml-2">Desestimado</span>
                           )}
                         </td>
                       </tr>
@@ -1044,6 +1058,14 @@ export function AdminPanel() {
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         onProjectCreated={fetchAdminData}
+      />
+
+      <ProposalDetailModal
+        isOpen={isProposalModalOpen}
+        onClose={() => setIsProposalModalOpen(false)}
+        proposal={selectedProposal}
+        onApprove={handleApproveProposalAndPublish}
+        onReject={handleRejectProposal}
       />
     </Card>
   );
