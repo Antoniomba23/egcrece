@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
 import { CreateProjectModal } from "@/components/dashboard/CreateProjectModal";
 import { InvestModal } from "@/components/dashboard/InvestModal";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Building2, Sprout, Zap, PlusCircle, RefreshCw } from "lucide-react";
 
 export interface InvestmentProject {
@@ -118,7 +119,28 @@ export function ProjectCatalog() {
         </div>
       </div>
 
-      {projects.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((idx) => (
+            <div key={idx} className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+              <div className="flex justify-between items-center">
+                <Skeleton className="h-5 w-24 rounded-full bg-slate-800" />
+                <Skeleton className="h-4 w-28 bg-slate-800" />
+              </div>
+              <Skeleton className="h-6 w-3/4 bg-slate-800" />
+              <Skeleton className="h-4 w-1/2 bg-slate-800" />
+              <div className="space-y-2 pt-4">
+                <div className="flex justify-between">
+                  <Skeleton className="h-4 w-20 bg-slate-800" />
+                  <Skeleton className="h-5 w-16 bg-slate-800" />
+                </div>
+                <Skeleton className="h-2 w-full rounded-full bg-slate-800" />
+              </div>
+              <Skeleton className="h-10 w-full rounded-lg bg-slate-800" />
+            </div>
+          ))}
+        </div>
+      ) : projects.length === 0 ? (
         <div className="p-8 sm:p-12 rounded-2xl bg-slate-900 border border-slate-800 text-center space-y-4 my-6 shadow-xl">
           <div className="h-14 w-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto text-emerald-400">
             <Building2 className="h-7 w-7" />

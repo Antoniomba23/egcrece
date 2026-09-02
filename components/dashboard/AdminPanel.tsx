@@ -736,7 +736,8 @@ export function AdminPanel() {
               </h4>
             </div>
 
-            <div className="overflow-x-auto rounded-lg border border-slate-800 bg-slate-950">
+            {/* Vista Escritorio: Tabla (hidden md:block) */}
+            <div className="hidden md:block overflow-x-auto rounded-lg border border-slate-800 bg-slate-950">
               <table className="w-full text-left text-xs text-slate-300">
                 <thead className="bg-slate-900 text-slate-400 uppercase tracking-wider border-b border-slate-800">
                   <tr>
@@ -831,6 +832,85 @@ export function AdminPanel() {
                   )}
                 </tbody>
               </table>
+            </div>
+
+            {/* Vista Móvil Extrema: Tarjetas Apilables (<768px) */}
+            <div className="grid grid-cols-1 gap-3 md:hidden">
+              {proposals.length === 0 ? (
+                <div className="p-6 text-center text-slate-500 text-xs bg-slate-950 rounded-xl border border-slate-800">
+                  No hay solicitudes de financiación registradas por promotores actualmente.
+                </div>
+              ) : (
+                proposals.map((prop) => (
+                  <div key={prop.id} className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3 shadow-lg">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="font-bold text-white text-sm block">{prop.title}</span>
+                        <span className="text-[11px] text-slate-400 block">{prop.category} • {prop.location}</span>
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className={`text-[10px] ${
+                          prop.status === "approved"
+                            ? "bg-emerald-950 text-emerald-400 border-emerald-800"
+                            : prop.status === "rejected"
+                            ? "bg-rose-950 text-rose-400 border-rose-800"
+                            : "bg-amber-950 text-amber-400 border-amber-800"
+                        }`}
+                      >
+                        {prop.status.toUpperCase()}
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs bg-slate-900 p-2.5 rounded-lg">
+                      <div>
+                        <span className="text-slate-400 block text-[10px]">Capital Meta</span>
+                        <span className="font-bold text-emerald-400">{formatCurrency(prop.target_amount)}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block text-[10px]">TIR Ofrecida</span>
+                        <span className="font-bold text-white">+{prop.expected_return}%</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 pt-1 border-t border-slate-800">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedProposal(prop);
+                          setIsProposalModalOpen(true);
+                        }}
+                        className="border-slate-700 hover:border-emerald-500 text-emerald-400 text-[11px] h-8 flex-1 font-semibold"
+                      >
+                        <FileSearch className="h-3.5 w-3.5 mr-1" /> Expediente
+                      </Button>
+
+                      {prop.status === "pending" && (
+                        <>
+                          <Button
+                            size="sm"
+                            disabled={actionPropId === prop.id}
+                            onClick={() => handleApproveProposalAndPublish(prop)}
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] h-8 flex-1 font-bold"
+                          >
+                            <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Aprobar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            disabled={actionPropId === prop.id}
+                            onClick={() => handleRejectProposal(prop.id)}
+                            className="text-[11px] h-8 px-3"
+                          >
+                            <XCircle className="h-3.5 w-3.5" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}

@@ -76,7 +76,10 @@ export function SimuladorInversion() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="initial">Capital Inicial (XAF)</Label>
+            <div className="flex justify-between items-center text-xs font-semibold mb-1">
+              <Label htmlFor="initial">Capital Inicial (XAF)</Label>
+              <span className="text-emerald-400 font-bold font-mono">{formatCurrency(initialAmount)}</span>
+            </div>
             <Input
               id="initial"
               type="number"
@@ -84,26 +87,50 @@ export function SimuladorInversion() {
               onChange={(e) => setInitialAmount(Number(e.target.value))}
               min={0}
               step={5000}
-              className="mt-1"
+              className="bg-slate-950 border-slate-800 text-white font-bold"
+            />
+            <input
+              type="range"
+              min={0}
+              max={5000000}
+              step={25000}
+              value={initialAmount}
+              onChange={(e) => setInitialAmount(Number(e.target.value))}
+              className="w-full mt-2 accent-emerald-500 cursor-pointer h-2 bg-slate-950 rounded-lg"
             />
           </div>
 
           <div>
-            <Label htmlFor="monthly">Aportación Mensual (XAF)</Label>
+            <div className="flex justify-between items-center text-xs font-semibold mb-1">
+              <Label htmlFor="monthly">Aportación Mensual (XAF)</Label>
+              <span className="text-teal-400 font-bold font-mono">{formatCurrency(monthlyContribution)}</span>
+            </div>
             <Input
               id="monthly"
               type="number"
               value={monthlyContribution}
               onChange={(e) => setMonthlyContribution(Number(e.target.value))}
               min={0}
-              step={2000}
-              className="mt-1"
+              step={1000}
+              className="bg-slate-950 border-slate-800 text-white font-bold"
+            />
+            <input
+              type="range"
+              min={0}
+              max={500000}
+              step={5000}
+              value={monthlyContribution}
+              onChange={(e) => setMonthlyContribution(Number(e.target.value))}
+              className="w-full mt-2 accent-teal-500 cursor-pointer h-2 bg-slate-950 rounded-lg"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="years">Plazo (Años)</Label>
+              <div className="flex justify-between items-center text-xs font-semibold mb-1">
+                <Label htmlFor="years">Plazo (Años)</Label>
+                <span className="text-white font-bold">{years} Años</span>
+              </div>
               <Input
                 id="years"
                 type="number"
@@ -111,11 +138,24 @@ export function SimuladorInversion() {
                 onChange={(e) => setYears(Number(e.target.value))}
                 min={1}
                 max={30}
-                className="mt-1"
+                className="bg-slate-950 border-slate-800 text-white font-bold"
+              />
+              <input
+                type="range"
+                min={1}
+                max={20}
+                step={1}
+                value={years}
+                onChange={(e) => setYears(Number(e.target.value))}
+                className="w-full mt-2 accent-emerald-500 cursor-pointer h-2 bg-slate-950 rounded-lg"
               />
             </div>
+
             <div>
-              <Label htmlFor="rate">Rendimiento Anual Estimado (%)</Label>
+              <div className="flex justify-between items-center text-xs font-semibold mb-1">
+                <Label htmlFor="rate">TIR / Retorno Anual (%)</Label>
+                <span className="text-emerald-400 font-bold">+{annualRate}%</span>
+              </div>
               <Input
                 id="rate"
                 type="number"
@@ -124,7 +164,16 @@ export function SimuladorInversion() {
                 step={0.5}
                 min={1}
                 max={30}
-                className="mt-1"
+                className="bg-slate-950 border-slate-800 text-white font-bold"
+              />
+              <input
+                type="range"
+                min={5}
+                max={25}
+                step={0.5}
+                value={annualRate}
+                onChange={(e) => setAnnualRate(Number(e.target.value))}
+                className="w-full mt-2 accent-emerald-500 cursor-pointer h-2 bg-slate-950 rounded-lg"
               />
             </div>
           </div>

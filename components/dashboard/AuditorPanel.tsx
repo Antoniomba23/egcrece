@@ -255,7 +255,8 @@ export function AuditorPanel() {
               <Activity className="h-4 w-4 text-blue-400" />
               <span>Pista de Auditoría de Administradores (Audit Trail Inmutable)</span>
             </h4>
-            <div className="overflow-x-auto rounded-lg border border-slate-800 bg-slate-950">
+            {/* Vista Escritorio: Tabla (hidden md:block) */}
+            <div className="hidden md:block overflow-x-auto rounded-lg border border-slate-800 bg-slate-950">
               <table className="w-full text-left text-xs text-slate-300">
                 <thead className="bg-slate-900 text-slate-400 uppercase tracking-wider border-b border-slate-800">
                   <tr>
@@ -286,6 +287,31 @@ export function AuditorPanel() {
                   )}
                 </tbody>
               </table>
+            </div>
+
+            {/* Vista Móvil Extrema: Tarjetas Apilables (<768px) */}
+            <div className="grid grid-cols-1 gap-3 md:hidden">
+              {auditLogs.length === 0 ? (
+                <div className="p-6 text-center text-slate-500 text-xs bg-slate-950 rounded-xl border border-slate-800">
+                  Sin eventos registrados en la tabla de auditoría.
+                </div>
+              ) : (
+                auditLogs.map((log) => (
+                  <div key={log.id} className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2 text-xs shadow-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-white uppercase">{log.action}</span>
+                      <span className="text-[10px] text-blue-400 font-mono">{log.actor_id.slice(0, 8)}...</span>
+                    </div>
+                    <div className="flex justify-between text-[11px] text-slate-400">
+                      <span>Objetivo: <strong className="text-slate-200">{log.target_type}</strong></span>
+                      <span>{new Date(log.created_at).toLocaleDateString("es-ES")}</span>
+                    </div>
+                    <div className="p-2 rounded bg-slate-900 font-mono text-[10px] text-slate-400 truncate">
+                      {JSON.stringify(log.metadata || {})}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}
