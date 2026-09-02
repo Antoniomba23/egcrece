@@ -18,6 +18,7 @@ export function Footer() {
         <div>
           <h4 className="font-semibold text-slate-200 mb-3">Plataforma</h4>
           <ul className="space-y-2 text-xs">
+            <li><Link href="/aprende" className="hover:text-emerald-400 transition-colors font-medium">Aprende / Glosario</Link></li>
             <li><Link href="/simulador" className="hover:text-emerald-400 transition-colors">Simulador de Interés</Link></li>
             <li><Link href="/proyectos" className="hover:text-emerald-400 transition-colors">Catálogo de Proyectos</Link></li>
             <li><Link href="/presentar-proyecto" className="hover:text-emerald-400 transition-colors font-bold text-emerald-400">Buscar Financiación / Promotores</Link></li>

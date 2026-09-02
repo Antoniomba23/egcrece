@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
-import { Wallet, ShieldCheck, PieChart, LogOut, LogIn, UserPlus, Menu, X, Home, Calculator, Building2, UserCheck, User as UserIcon, Sparkles } from "lucide-react";
+import { Wallet, ShieldCheck, PieChart, LogOut, LogIn, UserPlus, Menu, X, Home, Calculator, Building2, UserCheck, User as UserIcon, Sparkles, BookOpen } from "lucide-react";
 import { Logo } from "@/components/shared/Logo";
 
 export function Navbar() {
@@ -51,6 +51,14 @@ export function Navbar() {
 
         {/* Navegación Escritorio */}
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-300">
+          <Link
+            href="/aprende"
+            className={`transition-colors hover:text-emerald-400 ${
+              pathname === "/aprende" ? "text-emerald-400 font-semibold" : ""
+            }`}
+          >
+            Aprende
+          </Link>
           <Link
             href="/simulador"
             className={`transition-colors hover:text-emerald-400 ${
@@ -172,6 +180,16 @@ export function Navbar() {
             >
               <Home className="h-4 w-4" />
               <span>Inicio</span>
+            </Link>
+
+            <Link
+              href="/aprende"
+              className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                pathname === "/aprende" ? "bg-emerald-950/80 text-emerald-400 font-bold" : "text-slate-300 hover:bg-slate-900"
+              }`}
+            >
+              <BookOpen className="h-4 w-4" />
+              <span>Aprende / Glosario</span>
             </Link>
 
             <Link

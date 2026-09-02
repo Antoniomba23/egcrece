@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ShieldCheck, PieChart, Calculator, FolderKanban } from "lucide-react";
+import { LayoutDashboard, ShieldCheck, PieChart, Calculator, FolderKanban, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigationItems = [
   { name: "Resumen General", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Aprende / Glosario", href: "/aprende", icon: BookOpen },
   { name: "Simulador de Ahorro", href: "/simulador", icon: Calculator },
   { name: "Catálogo de Proyectos", href: "/proyectos", icon: FolderKanban },
   { name: "Verificación KYC", href: "/kyc", icon: ShieldCheck },

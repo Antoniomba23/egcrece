@@ -1,0 +1,123 @@
+{
+  "levels": [
+    {
+      "id": 1,
+      "title": "Nivel 1: El Despertar Financiero (Mentalidad)",
+      "subtitle": "Fundamentos sobre el valor del dinero y el cambio de hábitos",
+      "description": "Comprende cómo proteger tu capital del paso del tiempo y cambiar el hábito del ahorro pasivo en efectivo hacia la inversión en la economía real."
+    },
+    {
+      "id": 2,
+      "title": "Nivel 2: Mecánica de la Plataforma (Confianza)",
+      "subtitle": "Seguridad, cuentas y funcionamiento interno de EGCrece",
+      "description": "Conoce las garantías legales, la verificación de identidad, el funcionamiento de tu billetera digital y las reglas de inmovilización del capital."
+    },
+    {
+      "id": 3,
+      "title": "Nivel 3: Evaluación de Proyectos (Toma de Decisiones)",
+      "subtitle": "Indicadores clave, análisis de riesgos y liquidación de ganancias",
+      "description": "Aprende a analizar oportunidades de inversión en Guinea Ecuatorial, calcular tus retornos y proteger tu patrimonio mediante la diversificación."
+    }
+  ],
+  "terms": [
+    {
+      "id": "inflacion",
+      "levelId": 1,
+      "term": "Inflación",
+      "badge": "Mentalidad",
+      "tooltip": "Pérdida paulatina del poder adquisitivo del dinero en efectivo debido al incremento general de los precios.",
+      "microCapsula": "La inflación es la pérdida de valor que sufre el dinero guardado en efectivo o en cuentas bancarias tradicionales sin remunerar. A medida que suben los precios del mercado en Guinea Ecuatorial y la zona CEMAC, la misma cantidad de dinero permite adquirir menos bienes y servicios con el paso de los años.",
+      "ejemploPractico": "Si guardas 1.000.000 XAF en efectivo en un cajón durante 3 años con una inflación media del 3.5% anual, mantendrás exactamente el mismo número de billetes, pero su capacidad real de compra equivaldrá aproximadamente a 900.000 XAF de tres años atrás. Invertir en proyectos productivos permite superar la inflación y preservar tu poder adquisitivo."
+    },
+    {
+      "id": "preahorro",
+      "levelId": 1,
+      "term": "Preahorro",
+      "badge": "Mentalidad",
+      "tooltip": "La regla de oro de apartar un porcentaje fijo de tus ingresos el primer día en lugar de invertir lo que sobra a fin de mes.",
+      "microCapsula": "El preahorro invierte la fórmula convencional del ahorro. En lugar de gastar durante el mes y tratar de guardar lo que sobra al final, programas una aportación el primer día al recibir tus ingresos. De este modo garantizas el cumplimiento de tus objetivos financieros sin depender de la disciplina diaria.",
+      "ejemploPractico": "Al recibir tu nómina mensual de 400.000 XAF, separas de manera automática un 10% (40.000 XAF) directamente hacia tu billetera EGCrece antes de pagar facturas u otros compromisos. Adaptas tu presupuesto mensual a los 360.000 XAF restantes mientras tu patrimonio crece de forma constante."
+    },
+    {
+      "id": "interes-compuesto",
+      "levelId": 1,
+      "term": "Interés Compuesto",
+      "badge": "Mentalidad",
+      "tooltip": "El efecto acumulativo donde las ganancias generadas se reinvierten para producir nuevos beneficios en el tiempo.",
+      "microCapsula": "El interés compuesto ocurre cuando los rendimientos generados por una inversión no se retiran, sino que se suman al capital inicial. En el siguiente periodo, los beneficios se calculan sobre la suma total, acelerando el crecimiento de tu dinero año tras año.",
+      "ejemploPractico": "Inviertes 500.000 XAF al 10% de rendimiento anual en un proyecto productivo. Al finalizar el año 1 recibes 50.000 XAF de rendimiento. Si los reinviertes junto al capital inicial, en el año 2 el 10% se aplicará sobre 550.000 XAF, obteniendo 55.000 XAF adicionales. En 5 años, tu saldo acumulado superará los 805.000 XAF."
+    },
+    {
+      "id": "economia-productiva",
+      "levelId": 1,
+      "term": "Economía Productiva vs. Especulación",
+      "badge": "Mentalidad",
+      "tooltip": "Financiación de activos reales locales tangibles en oposición a la compra de activos abstractos volátiles.",
+      "microCapsula": "La inversión en economía productiva respalda proyectos reales con actividad comercial verificable en Malabo o Bata (como agroindustria, transporte o logística) que generan ingresos por venta de bienes o servicios. Se contrapone a la especulación bursátil o criptoactivos, donde el valor depende exclusivamente de fluctuaciones o rumores en mercados externos.",
+      "ejemploPractico": "Financiar la instalación de cámaras frigoríficas para la conservación de pescado en Bata genera flujo de caja real mediante el cobro del servicio a comerciantes locales. Tu retorno proviene de los ingresos operativos del negocio real, no de intentar adivinar qué criptomoneda subirá mañana."
+    },
+    {
+      "id": "kyc",
+      "levelId": 2,
+      "term": "KYC (Conoce a tu Cliente)",
+      "badge": "Confianza",
+      "tooltip": "Proceso legal de verificación de identidad obligatorio mediante Documento Nacional de Identidad o Pasaporte para prevenir el fraude.",
+      "microCapsula": "KYC es el procedimiento de verificación exigido por la ley para validar la identidad de cada usuario mediante su Documento Nacional de Identidad o Pasaporte oficial. Esta verificación asegura que todos los participantes en la plataforma sean personas reales y auditadas, blindando el ecosistema de EGCrece contra la suplantación de identidad y protegiendo a la comunidad contra el fraude.",
+      "ejemploPractico": "Antes de realizar tu primera inversión de 100.000 XAF, la plataforma solicita subir una foto clara de tu Documento Nacional de Identidad. Una vez validado por el equipo de cumplimiento, tu perfil queda verificado con sello legal, garantizando la titularidad exclusiva de tus aportaciones y retornos."
+    },
+    {
+      "id": "billetera-vs-capital",
+      "levelId": 2,
+      "term": "Billetera (Wallet) vs. Capital Invertido",
+      "badge": "Confianza",
+      "tooltip": "Diferencia entre el saldo líquido disponible listo para retirar y el saldo trabajando en proyectos activos.",
+      "microCapsula": "Tu saldo en EGCrece se divide en dos categorías operativas: la Billetera (Wallet) representa tus fondos líquidos en efectivo preparados para retirar a tu cuenta bancaria o móvil, o bien para reinvertir; el Capital Invertido son las cantidades asignadas a proyectos en ejecución que se encuentran produciendo rendimientos.",
+      "ejemploPractico": "Si dispones de 300.000 XAF en tu Billetera y aportas 200.000 XAF a la ampliación de una granja avícola en Evinayong, tu Billetera reflejará un saldo disponible de 100.000 XAF (retirable en cualquier momento), mientras que tu saldo de Capital Invertido mostrará 200.000 XAF trabajando activamente durante el plazo acordado."
+    },
+    {
+      "id": "liquidez-inmovilizacion",
+      "levelId": 2,
+      "term": "Liquidez y Plazo de Inmovilización",
+      "badge": "Confianza",
+      "tooltip": "Compromiso de permanencia del capital durante el desarrollo de la obra o actividad del proyecto productivo.",
+      "microCapsula": "Cuando financias un proyecto productivo real, tus fondos se transforman en activos tangibles. Si el proyecto consiste en construir una escuela o un almacén, el dinero se encuentra materializado en los ladrillos, materiales e instalaciones físicas. Por este motivo, el capital no se puede retirar a mitad de proyecto y permanece inmovilizado hasta el vencimiento estipulado.",
+      "ejemploPractico": "Aportas 150.000 XAF a la construcción de un centro educativo en Malabo con un plazo de 18 meses. Dado que el dinero está invertido en la infraestructura física en curso, la recuperación del capital e intereses se realiza progresivamente según el calendario de cuotas de la obra."
+    },
+    {
+      "id": "tir",
+      "levelId": 3,
+      "term": "TIR (Tasa Interna de Retorno)",
+      "badge": "Decisiones",
+      "tooltip": "Porcentaje anualizado que refleja el rendimiento esperado sobre el capital invertido en las tarjetas de proyectos.",
+      "microCapsula": "La TIR representa la tasa de rentabilidad anual esperada de un proyecto (por ejemplo 12% anual). Permite comparar fácilmente el beneficio relativo entre distintas oportunidades de inversión en la plataforma, considerando tanto el importe total de las ganancias como el tiempo en que se reciben las liquidaciones.",
+      "ejemploPractico": "Un proyecto de instalación de energía solar comercial muestra una TIR del 12% anual a 12 meses. Si inviertes 500.000 XAF en esta tarjeta, la proyección contempla generar 60.000 XAF de rendimiento bruto distribuidos a lo largo del año de vigencia."
+    },
+    {
+      "id": "diversificacion",
+      "levelId": 3,
+      "term": "Diversificación",
+      "badge": "Decisiones",
+      "tooltip": "Estrategia de repartir el capital en varios proyectos independientes para minimizar el riesgo total.",
+      "microCapsula": "La diversificación consiste en no colocar todo el presupuesto en un solo proyecto o sector. Al distribuir tu dinero entre distintas oportunidades en Guinea Ecuatorial (por ejemplo agroindustria, comercio e infraestructura), reduces la exposición a imprevistos: si un proyecto sufre alguna demora, las ganancias de los otros compensan el rendimiento global.",
+      "ejemploPractico": "En lugar de invertir 50.000 XAF en un único proyecto inmobiliario, aportas 15.000 XAF a producción agrícola, 15.000 XAF a logística en Bata y 20.000 XAF a instalaciones de energía renovable en Malabo. Así proteges la estabilidad de tus retornos."
+    },
+    {
+      "id": "colateral-garantia",
+      "levelId": 3,
+      "term": "Colateral / Garantía",
+      "badge": "Decisiones",
+      "tooltip": "Activos físicos (terrenos, naves o maquinaria) que respaldan la devolución del dinero aportado por los inversores.",
+      "microCapsula": "El colateral es un respaldo patrimonial tangible asignado legalmente por el promotor para respaldar la financiación. Si el promotor del proyecto atraviesa un contratiempo o incumplimiento, la garantía real (terrenos escriturados, maquinaria o naves industriales) respalda la recuperación del capital de los inversores.",
+      "ejemploPractico": "Un promotor que solicita 20.000.000 XAF para una planta procesadora de alimentos en Luba aporta como colateral un terreno escriturado valorado en 30.000.000 XAF y el equipamiento industrial. Si el proyecto sufriera una interrupción, el colateral garantiza la cobertura del dinero de los inversores."
+    },
+    {
+      "id": "liquidacion-cupones",
+      "levelId": 3,
+      "term": "Liquidación de Cupones / Dividendos",
+      "badge": "Decisiones",
+      "tooltip": "Abono periódico de los beneficios acordados directamente en tu billetera de EGCrece.",
+      "microCapsula": "La liquidación es el procedimiento mediante el cual el promotor transfiere periódicamente los beneficios generados y la devolución del capital a los inversores. Estos abonos se acreditan automáticamente en tu Billetera digital de EGCrece según el calendario estipulado en la ficha del proyecto.",
+      "ejemploPractico": "En un proyecto con liquidaciones trimestrales y rendimiento del 12% anual, por una aportación de 400.000 XAF recibirás 12.000 XAF de ganancias en tu Billetera al cierre de cada trimestre (48.000 XAF al año), pudiendo retirarlos inmediatamente o reinvertirlos en nuevos proyectos."
+    }
+  ]
+}
