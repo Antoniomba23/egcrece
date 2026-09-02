@@ -83,8 +83,8 @@ export function EditProjectModal({ isOpen, onClose, project, onProjectUpdated }:
         },
       ];
 
-      // Intentar actualización completa
-      let updatePayload: any = {
+      const fullPayload: any = {
+        id: project.id,
         title,
         category,
         location,
@@ -100,94 +100,69 @@ export function EditProjectModal({ isOpen, onClose, project, onProjectUpdated }:
         legal_documents: legalDocs,
       };
 
+      // 1. Intentar actualización completa en Supabase
       let { error } = await supabase
         .from("projects")
-        .update(updatePayload)
+        .update(fullPayload)
         .eq("id", project.id);
 
-      // Si falla por columna no existente en la base de datos de Supabase, reintentar con payload estándar
-      if (error && (error.message?.includes("business_model") || error.message?.includes("schema cache") || error.message?.includes("column"))) {
-        delete updatePayload.business_model;
-        delete updatePayload.risks_guarantees;
-        const res2 = await supabase
+      // 2. Si falla Supabase por columnas no existentes en la BD remota (HTTP 400),
+      // reintentar con el payload estándar básico
+      if (error) {
+        const corePayload = {
+          title,
+          category,
+          location,
+          target_amount: targetAmount,
+          expected_return: expectedReturn,
+          duration_months: durationMonths,
+          risk_level: riskLevel,
+          status,
+        };
+        await supabase
           .from("projects")
-          .update(updatePayload)
+          .update(corePayload)
           .eq("id", project.id);
-        error = res2.error;
       }
 
-      // Actualizar también en el almacenamiento local para sincronización instantánea
+      // 3. SIEMPRE persistir todos los campos modificados (foto, descripción, modelo de negocio, etc.)
+      // en el mapa local egcrece_edited_projects y egcrece_approved_projects
       try {
-        let localApproved = JSON.parse(localStorage.getItem("egcrece_approved_projects") || "[]");
-        localApproved = localApproved.map((p: any) => {
-          if (p.id === project.id) {
-            return {
-              ...p,
-              title,
-              category,
-              location,
-              target_amount: targetAmount,
-              expected_return: expectedReturn,
-              duration_months: durationMonths,
-              risk_level: riskLevel,
-              status,
-              description: description || null,
-              business_model: businessModel || null,
-              risks_guarantees: risksGuarantees || null,
-              image_url: imageUrl || null,
-              legal_documents: legalDocs,
-            };
-          }
-          return p;
-        });
+        let editedMap: Record<string, any> = {};
+        try {
+          editedMap = JSON.parse(localStorage.getItem("egcrece_edited_projects") || "{}");
+        } catch (e) {}
+        editedMap[project.id] = fullPayload;
+        localStorage.setItem("egcrece_edited_projects", JSON.stringify(editedMap));
+
+        let localApproved: any[] = [];
+        try {
+          localApproved = JSON.parse(localStorage.getItem("egcrece_approved_projects") || "[]");
+        } catch (e) {}
+        const idx = localApproved.findIndex((p: any) => p.id === project.id);
+        if (idx >= 0) {
+          localApproved[idx] = { ...localApproved[idx], ...fullPayload };
+        } else {
+          localApproved.push(fullPayload);
+        }
         localStorage.setItem("egcrece_approved_projects", JSON.stringify(localApproved));
       } catch (e) {}
 
       setStatusMessage({
         type: "success",
-        text: "Parámetros y documentación PDP del proyecto actualizados correctamente.",
+        text: "Parámetros, portada y expediente PDP del proyecto guardados correctamente.",
       });
 
       setTimeout(() => {
         onProjectUpdated();
         onClose();
-      }, 1200);
+      }, 1000);
     } catch (err: any) {
-      // Incluso si la BD remota tiene problemas, actualizar localmente sin bloquear al usuario
-      try {
-        let localApproved = JSON.parse(localStorage.getItem("egcrece_approved_projects") || "[]");
-        localApproved = localApproved.map((p: any) => {
-          if (p.id === project.id) {
-            return {
-              ...p,
-              title,
-              category,
-              location,
-              target_amount: targetAmount,
-              expected_return: expectedReturn,
-              duration_months: durationMonths,
-              risk_level: riskLevel,
-              status,
-              description: description || null,
-              business_model: businessModel || null,
-              risks_guarantees: risksGuarantees || null,
-              image_url: imageUrl || null,
-            };
-          }
-          return p;
-        });
-        localStorage.setItem("egcrece_approved_projects", JSON.stringify(localApproved));
-      } catch (e) {}
-
+      console.error("Error al actualizar proyecto:", err);
       setStatusMessage({
-        type: "success",
-        text: "Modificaciones guardadas exitosamente.",
+        type: "error",
+        text: err.message || "Error al guardar modificaciones",
       });
-
-      setTimeout(() => {
-        onProjectUpdated();
-        onClose();
-      }, 1200);
     } finally {
       setLoading(false);
     }

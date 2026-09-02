@@ -65,24 +65,23 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         .eq("id", projectId)
         .single();
 
-      if (!error && data) {
-        setProject(data);
-      } else {
+      let target: any = data;
+
+      if (!target) {
         let localApproved: any[] = [];
         try {
           localApproved = JSON.parse(localStorage.getItem("egcrece_approved_projects") || "[]");
         } catch (e) {}
-        const found = localApproved.find((p: any) => p.id === projectId);
-        if (found) {
-          setProject(found);
-        } else {
+        target = localApproved.find((p: any) => p.id === projectId);
+
+        if (!target) {
           let localProps: any[] = [];
           try {
             localProps = JSON.parse(localStorage.getItem("egcrece_proposals") || "[]");
           } catch (e) {}
           const foundProp = localProps.find((p: any) => p.id === projectId);
           if (foundProp) {
-            setProject({
+            target = {
               id: foundProp.id,
               title: foundProp.title,
               category: foundProp.category,
@@ -96,12 +95,21 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               description: foundProp.description,
               business_model: foundProp.business_model,
               risks_guarantees: foundProp.risks_guarantees,
-            });
-          } else {
-            setProject(null);
+            };
           }
         }
       }
+
+      let editedMap: Record<string, any> = {};
+      try {
+        editedMap = JSON.parse(localStorage.getItem("egcrece_edited_projects") || "{}");
+      } catch (e) {}
+
+      if (target && editedMap[projectId]) {
+        target = { ...target, ...editedMap[projectId] };
+      }
+
+      setProject(target || null);
     } catch (err) {
       console.error("Error al cargar detalle del proyecto:", err);
       setProject(null);

@@ -116,7 +116,29 @@ export function AdminPanel() {
         .from("projects")
         .select("*")
         .order("created_at", { ascending: false });
-      setProjects(projData || []);
+
+      let localApproved: any[] = [];
+      try {
+        localApproved = JSON.parse(localStorage.getItem("egcrece_approved_projects") || "[]");
+      } catch (e) {}
+
+      let editedMap: Record<string, any> = {};
+      try {
+        editedMap = JSON.parse(localStorage.getItem("egcrece_edited_projects") || "{}");
+      } catch (e) {}
+
+      const combinedProjects = [...(projData || [])];
+      for (const la of localApproved) {
+        if (!combinedProjects.some((p) => p.id === la.id)) {
+          combinedProjects.push(la);
+        }
+      }
+
+      const mergedProjects = combinedProjects.map((p) => {
+        return editedMap[p.id] ? { ...p, ...editedMap[p.id] } : p;
+      });
+
+      setProjects(mergedProjects);
 
       // 4. Propuestas de Proyectos de Promotores
       const { data: propData } = await supabase

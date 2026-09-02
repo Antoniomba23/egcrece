@@ -78,17 +78,32 @@ export function ProjectCatalog() {
         }
       }
 
-      const mapped = combinedRaw.map((p: any) => ({
-        id: p.id,
-        title: p.title,
-        category: p.category,
-        location: p.location,
-        targetAmount: Number(p.target_amount),
-        raisedAmount: Number(p.raised_amount || 0),
-        expectedReturn: Number(p.expected_return),
-        durationMonths: Number(p.duration_months),
-        riskLevel: p.risk_level || "Moderado",
-      }));
+      let editedMap: Record<string, any> = {};
+      try {
+        editedMap = JSON.parse(localStorage.getItem("egcrece_edited_projects") || "{}");
+      } catch (e) {}
+
+      const mapped = combinedRaw.map((raw: any) => {
+        const p = editedMap[raw.id] ? { ...raw, ...editedMap[raw.id] } : raw;
+        return {
+          id: p.id,
+          title: p.title,
+          category: p.category,
+          location: p.location,
+          targetAmount: Number(p.target_amount || p.targetAmount),
+          raisedAmount: Number(p.raised_amount || p.raisedAmount || 0),
+          expectedReturn: Number(p.expected_return || p.expectedReturn),
+          durationMonths: Number(p.duration_months || p.durationMonths),
+          riskLevel: p.risk_level || p.riskLevel || "Moderado",
+          status: p.status,
+          description: p.description,
+          businessModel: p.business_model || p.businessModel,
+          risksGuarantees: p.risks_guarantees || p.risksGuarantees,
+          imageUrl: p.image_url || p.imageUrl,
+          legalDocuments: p.legal_documents || p.legalDocuments,
+          rawProject: p,
+        };
+      });
 
       setProjects(mapped);
 
