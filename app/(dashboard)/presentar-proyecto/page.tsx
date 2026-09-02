@@ -392,8 +392,8 @@ export default function PresentarProyectoPage() {
                     type="number"
                     value={targetAmount}
                     onChange={(e) => setTargetAmount(Number(e.target.value))}
-                    min={1000000}
-                    step={1000000}
+                    min={1000}
+                    step={1000}
                     required
                     className="mt-1 bg-slate-950 border-slate-800 font-bold text-emerald-400 text-sm"
                   />
@@ -407,7 +407,7 @@ export default function PresentarProyectoPage() {
                     value={promoterContribution}
                     onChange={(e) => setPromoterContribution(Number(e.target.value))}
                     min={0}
-                    step={1000000}
+                    step={1000}
                     className="mt-1 bg-slate-950 border-slate-800 font-bold text-teal-400 text-sm"
                   />
                 </div>
