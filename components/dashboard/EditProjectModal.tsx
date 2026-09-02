@@ -100,29 +100,16 @@ export function EditProjectModal({ isOpen, onClose, project, onProjectUpdated }:
         legal_documents: legalDocs,
       };
 
-      // 1. Intentar actualización completa en Supabase
-      let { error } = await supabase
-        .from("projects")
-        .update(fullPayload)
-        .eq("id", project.id);
+      // 1. Enviar actualización a la API Server con Service Role Key de Supabase
+      const res = await fetch("/api/projects/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fullPayload),
+      });
 
-      // 2. Si falla Supabase por columnas no existentes en la BD remota (HTTP 400),
-      // reintentar con el payload estándar básico
-      if (error) {
-        const corePayload = {
-          title,
-          category,
-          location,
-          target_amount: targetAmount,
-          expected_return: expectedReturn,
-          duration_months: durationMonths,
-          risk_level: riskLevel,
-          status,
-        };
-        await supabase
-          .from("projects")
-          .update(corePayload)
-          .eq("id", project.id);
+      const resData = await res.json();
+      if (!res.ok || resData.error) {
+        console.warn("Advertencia al actualizar en Supabase:", resData.error);
       }
 
       // 3. SIEMPRE persistir todos los campos modificados (foto, descripción, modelo de negocio, etc.)

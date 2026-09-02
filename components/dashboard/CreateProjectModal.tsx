@@ -71,23 +71,18 @@ export function CreateProjectModal({ isOpen, onClose, onProjectCreated }: Create
         status: "active",
       };
 
-      let { data: newProj, error } = await supabase
-        .from("projects")
-        .insert(insertPayload)
-        .select()
-        .single();
+      const res = await fetch("/api/projects/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(insertPayload),
+      });
 
-      if (error && (error.message?.includes("business_model") || error.message?.includes("schema cache") || error.message?.includes("column"))) {
-        delete insertPayload.business_model;
-        delete insertPayload.risks_guarantees;
-        const res2 = await supabase
-          .from("projects")
-          .insert(insertPayload)
-          .select()
-          .single();
-        error = res2.error;
-        newProj = res2.data;
+      const resData = await res.json();
+      if (!res.ok || resData.error) {
+        throw new Error(resData.error || "Error al publicar proyecto en Supabase");
       }
+
+      const newProj = resData.project;
 
       // Guardar también localmente
       const createdObj = {

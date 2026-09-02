@@ -320,35 +320,20 @@ export function AdminPanel() {
     try {
       setActionPropId(prop.id);
 
-      // 1. Insertar el nuevo proyecto en la tabla public.projects
-      const { data: newProject, error: projErr } = await supabase
-        .from("projects")
-        .insert({
-          title: prop.title,
-          category: prop.category,
-          location: prop.location,
-          target_amount: prop.target_amount,
-          raised_amount: prop.promoter_contribution || 0,
-          expected_return: prop.expected_return,
-          duration_months: prop.duration_months,
-          risk_level: "Moderado",
-          status: "active",
-          description: prop.description,
-          business_model: prop.business_model,
-          risks_guarantees: prop.risks_guarantees,
-        })
-        .select()
-        .single();
+      const res = await fetch("/api/projects/approve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ proposal: prop }),
+      });
 
-      if (projErr) throw projErr;
+      const resData = await res.json();
+      if (!res.ok || resData.error) {
+        throw new Error(resData.error || "Error al aprobar propuesta en Supabase");
+      }
 
-      // 2. Actualizar estado de la propuesta a 'approved'
-      await supabase
-        .from("project_proposals")
-        .update({ status: "approved" })
-        .eq("id", prop.id);
+      const newProject = resData.project;
 
-      // 3. Resguardo local inmediato para visibilidad instantánea
+      // Resguardo local inmediato para visibilidad instantánea
       const approvedProjObj = {
         id: newProject?.id || prop.id,
         title: prop.title,
@@ -383,41 +368,10 @@ export function AdminPanel() {
         title: prop.title,
       });
 
-      alert(`¡La propuesta "${prop.title}" fue APROBADA y PUBLICADA exitosamente en el catálogo de proyectos!`);
+      alert(`¡La propuesta "${prop.title}" fue APROBADA y PUBLICADA exitosamente en Supabase y en el catálogo!`);
       await fetchAdminData();
     } catch (err: any) {
-      // Si falla Supabase (por ejemplo RLS), publicar localmente
-      const approvedProjObj = {
-        id: prop.id,
-        title: prop.title,
-        category: prop.category,
-        location: prop.location,
-        target_amount: prop.target_amount,
-        raised_amount: prop.promoter_contribution || 0,
-        expected_return: prop.expected_return,
-        duration_months: prop.duration_months,
-        risk_level: "Moderado",
-        status: "active",
-        description: prop.description,
-        business_model: prop.business_model,
-        risks_guarantees: prop.risks_guarantees,
-        created_at: new Date().toISOString(),
-      };
-
-      try {
-        let currentApproved = JSON.parse(localStorage.getItem("egcrece_approved_projects") || "[]");
-        if (!currentApproved.some((p: any) => p.id === approvedProjObj.id)) {
-          currentApproved.push(approvedProjObj);
-          localStorage.setItem("egcrece_approved_projects", JSON.stringify(currentApproved));
-        }
-
-        let localProps = JSON.parse(localStorage.getItem("egcrece_proposals") || "[]");
-        localProps = localProps.map((p: any) => (p.id === prop.id ? { ...p, status: "approved" } : p));
-        localStorage.setItem("egcrece_proposals", JSON.stringify(localProps));
-      } catch (e) {}
-
-      alert(`¡La propuesta "${prop.title}" fue APROBADA y PUBLICADA en el catálogo de proyectos!`);
-      await fetchAdminData();
+      alert(`Error al aprobar propuesta: ${err.message}`);
     } finally {
       setActionPropId(null);
     }
