@@ -98,6 +98,52 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             };
           }
         }
+
+        if (!target) {
+          const DEFAULT_SEED_PROJECTS = [
+            {
+              id: "proj_seed_1",
+              title: "Expansión Agrícola Bioko Norte",
+              category: "Agroindustria",
+              location: "Malabo, Guinea Ecuatorial",
+              target_amount: 50000000,
+              raised_amount: 32500000,
+              expected_return: 10.5,
+              duration_months: 18,
+              risk_level: "Bajo",
+              status: "active",
+              description: "Ampliación de cultivos tecnificados de cacao y yuca con sistema de riego automatizado en Sampaka.",
+            },
+            {
+              id: "proj_seed_2",
+              title: "Parque Solar Fotovoltaico Bata",
+              category: "Energía Renovable",
+              location: "Bata, Región Continental",
+              target_amount: 120000000,
+              raised_amount: 84000000,
+              expected_return: 12.0,
+              duration_months: 24,
+              risk_level: "Moderado",
+              status: "active",
+              description: "Instalación de 500kWp en paneles solares industriales para suministro ininterrumpido en zona industrial.",
+            },
+            {
+              id: "proj_seed_3",
+              title: "Centro Logístico Puerto de Malabo",
+              category: "Infraestructura",
+              location: "Puerto de Malabo",
+              target_amount: 85000000,
+              raised_amount: 41000000,
+              expected_return: 9.2,
+              duration_months: 12,
+              risk_level: "Bajo",
+              status: "active",
+              description: "Construcción de almacenes frigoríficos de custodia portuaria para productos perecederos.",
+            },
+          ];
+
+          target = DEFAULT_SEED_PROJECTS.find((p: any) => p.id === projectId);
+        }
       }
 
       let editedMap: Record<string, any> = {};
