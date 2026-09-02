@@ -42,22 +42,55 @@ export function ProjectCatalog() {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (!error && data && data.length > 0) {
-        const mapped = data.map((p: any) => ({
-          id: p.id,
-          title: p.title,
-          category: p.category,
-          location: p.location,
-          targetAmount: Number(p.target_amount),
-          raisedAmount: Number(p.raised_amount),
-          expectedReturn: Number(p.expected_return),
-          durationMonths: Number(p.duration_months),
-          riskLevel: p.risk_level,
-        }));
-        setProjects(mapped);
-      } else {
-        setProjects([]);
+      const dbProjects = (!error && data) ? data : [];
+
+      let localApproved: any[] = [];
+      try {
+        localApproved = JSON.parse(localStorage.getItem("egcrece_approved_projects") || "[]");
+      } catch (e) {}
+
+      let localProposals: any[] = [];
+      try {
+        localProposals = JSON.parse(localStorage.getItem("egcrece_proposals") || "[]");
+      } catch (e) {}
+
+      const approvedProposals = localProposals.filter((p: any) => p.status === "approved");
+
+      const combinedRaw = [...dbProjects];
+      for (const la of localApproved) {
+        if (!combinedRaw.some((p: any) => p.id === la.id)) {
+          combinedRaw.push(la);
+        }
       }
+      for (const ap of approvedProposals) {
+        if (!combinedRaw.some((p: any) => p.id === ap.id)) {
+          combinedRaw.push({
+            id: ap.id,
+            title: ap.title,
+            category: ap.category,
+            location: ap.location,
+            target_amount: ap.target_amount,
+            raised_amount: ap.promoter_contribution || 0,
+            expected_return: ap.expected_return,
+            duration_months: ap.duration_months,
+            risk_level: "Moderado",
+          });
+        }
+      }
+
+      const mapped = combinedRaw.map((p: any) => ({
+        id: p.id,
+        title: p.title,
+        category: p.category,
+        location: p.location,
+        targetAmount: Number(p.target_amount),
+        raisedAmount: Number(p.raised_amount || 0),
+        expectedReturn: Number(p.expected_return),
+        durationMonths: Number(p.duration_months),
+        riskLevel: p.risk_level || "Moderado",
+      }));
+
+      setProjects(mapped);
 
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -72,8 +105,7 @@ export function ProjectCatalog() {
         }
       }
     } catch (err) {
-      console.error("Error al cargar proyectos de la base de datos:", err);
-      setProjects([]);
+      console.error("Error al cargar proyectos:", err);
     } finally {
       setLoading(false);
     }

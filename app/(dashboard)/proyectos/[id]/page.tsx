@@ -68,7 +68,39 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       if (!error && data) {
         setProject(data);
       } else {
-        setProject(null);
+        let localApproved: any[] = [];
+        try {
+          localApproved = JSON.parse(localStorage.getItem("egcrece_approved_projects") || "[]");
+        } catch (e) {}
+        const found = localApproved.find((p: any) => p.id === projectId);
+        if (found) {
+          setProject(found);
+        } else {
+          let localProps: any[] = [];
+          try {
+            localProps = JSON.parse(localStorage.getItem("egcrece_proposals") || "[]");
+          } catch (e) {}
+          const foundProp = localProps.find((p: any) => p.id === projectId);
+          if (foundProp) {
+            setProject({
+              id: foundProp.id,
+              title: foundProp.title,
+              category: foundProp.category,
+              location: foundProp.location,
+              target_amount: foundProp.target_amount,
+              raised_amount: foundProp.promoter_contribution || 0,
+              expected_return: foundProp.expected_return,
+              duration_months: foundProp.duration_months,
+              risk_level: "Moderado",
+              status: foundProp.status,
+              description: foundProp.description,
+              business_model: foundProp.business_model,
+              risks_guarantees: foundProp.risks_guarantees,
+            });
+          } else {
+            setProject(null);
+          }
+        }
       }
     } catch (err) {
       console.error("Error al cargar detalle del proyecto:", err);
